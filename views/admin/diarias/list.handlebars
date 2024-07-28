@@ -1,0 +1,729 @@
+<style>
+    th,
+    td {
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .td_laranja {
+        color: orange;
+    }
+
+    .td_verde {
+        color: green;
+    }
+
+    .td_vermelho {
+        color: red;
+    }
+
+    .contas {
+        color: orange;
+    }
+
+    .td_unidades {
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .td_unidades_right {
+        border-bottom: 1px solid #ddd;
+        text-align: right;
+    }
+
+    .th_dist {
+        background-color: #015050;
+        color: white;
+        text-align: center;
+    }
+
+    .th_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    .btn_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+</style>
+
+<script>
+    function downloadXLS() {
+    // ID do evento que você deseja consultar
+    const idEvento = {{user.dataValues.omeId}}; // Substitua pelo ID correto
+
+    // Fazendo uma requisição para o servidor para obter o arquivo XLS
+    fetch(`/diarias/gerar-arquivo-xls?id=${idEvento}`)
+        .then(response => response.blob())
+        .then(blob => {
+            // Criando um link temporário para o arquivo
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `SJES_DPO_{{nomeMes}}_2024_${idEvento}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => console.error('Erro ao fazer download do arquivo:', error));
+}
+
+</script>
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>DIARIAS | {{nomeMes}}_{{nomeAno}}</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <a onclick=""
+                                class="btn btn pull-right" style="margin-right: 5px;"><i
+                                    class="fa fa-download"></i> Prestar de Contas</a>
+                                                        
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <!-- top tiles -->
+                        <div class="row" style="display: inline-block; width: 100%;">
+                            <div class="tile_count" style="margin-top: 1px;">
+                                <div style="margin-top: 1px; margin-bottom: 1px;"
+                                    class="col-md-2 col-sm-4 col-xs-6  tile_stats_count">
+                                    <span class="count_top"><i class="fa fa-check-square-o"></i> Valor Liberado</span>
+                                    <div style="font-size: 20px;" class="count valor">{{valorGeralInicial}}</div>
+                                    <span class="count_bottom"><i class="">{{ctGeralInicial}} </i><i
+                                            class=""> Diarias(s)</i></span>
+                                </div>
+                                <div style="margin-top: 1px; margin-bottom: 1px;"
+                                    class="col-md-2 col-sm-4 col-xs-6  tile_stats_count">
+                                    <span class="count_top"><i class="fa fa-level-up"></i> Valor Distribuido</span>
+                                    <div style="font-size: 20px;" class="count blue valor">{{valorGeralDist}}</div>
+                                    <span class="count_bottom"><i class="">{{totalcotaDist}}</i> <i
+                                            class=""> <i class="fa fa-level-up"></i></i></span>
+                                </div>
+                                <div style="margin-top: 1px; margin-bottom: 1px;"
+                                    class="col-md-2 col-sm-4 col-xs-6  tile_stats_count">
+                                    <span class="count_top"><i class="fa fa-database"></i> Saldo do Mes</span>
+                                    <div {{#gt valorGeralDist valorGeralInicial }} style="color: rgb(255, 0, 55); font-size:21px;"{{/gt}}
+                                        style="font-size: 20px;" class="count green valor">
+                                        {{valorSaldoMes}}
+                                        </div>
+
+                                    <span class="count_bottom"><i class="">{{totalSaldoMes}}</i><i class=""> Diarias(s)</i></span>
+                                </div>
+                                <div style="margin-top: 1px; margin-bottom: 1px;"
+                                    class="col-md-2 col-sm-4 col-xs-6  tile_stats_count">
+                                    <span class="contas count_top"><i class="contas fa fa-exclamation"></i> Prestar Contas</span>
+                                    <div style="font-size: 30px;" class="count contas">{{totalPrestarContaPendente}}</div>
+                                    <span class="count_bottom contas"><i>Em aberto</i></span>
+                                </div>
+                                <div style="margin-top: 1px; margin-bottom: 1px;"
+                                    class="col-md-2 col-sm-4 col-xs-6  tile_stats_count">
+                                    <span class="count_top"><i class="fa fa-level-down"></i> Valor Executado</span>
+                                    <div style="font-size: 20px;" class="count valor">{{valorGeralExe}}</div>
+                                    <span class="count_bottom"><i class="">{{totalcotaExe}}</i> <i
+                                            class=""> <i class="fa fa-level-down"></i></i></span>
+                                </div>
+                                <div style="margin-top: 1px; margin-bottom: 1px;"
+                                    class="col-md-2 col-sm-4 col-xs-6  tile_stats_count">
+                                    <span class="count_top"><i class="fa fa-line-chart"></i> Saldo do Ano</span>
+                                    <div style="font-size: 20px;" class="count purple valor">{{valorSaldoCtRenAnual}}</div>
+                                    <span class="count_bottom"><i class="">{{totalSaldoCtRenAnual}}</i><i
+                                             class=""> Diarias(s)</i></span>
+                                </div>
+
+
+
+                                
+                            </div>
+                        </div>
+                        <!-- /top tiles -->
+
+                        <div class="">
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="x_panel">
+                                        <div class="x_content">
+                                            <div class="row">
+
+                                                <!-- /INICIO DIRETORIAS -->
+                                                <div class="col-sm-4 mail_list_column " style="font-size: 11px;">
+                                                    <button id="compose"
+                                                        style="background-color:#015050; border-color:white; color:white"
+                                                        class="btn btn-sm btn-block" type="button">DIRETORIAS</button>
+
+                                                    <!-- INICIO DPO -->
+                                                    <div>
+                                                        <div class="mail_list">
+                                                            <h3>DPO </h3>
+                                                            <div class="mail_list" style="width:100%; display: flex;">
+                                                                <!-- /INICIO DISTRIBUIÇÃO DPO -->
+                                                                    <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
+                                                                                    <th colspan="3">[Orig: {{totalcotaDistDpoOrig}} | Ref: {{totalcotaDistDpoRef}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> DISTRIBUIDO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Orig</th>
+                                                                                    <th class="th_dist">Ref</th>
+                                                                                    <th class="th_dist">Tt</th>
+                                                                                    <th class="th_dist">Valor Invest</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            {{#each total_cotadistdpo}}
+                                                                                <tr>
+                                                                                    <td class="">{{'ome.nome'}}</td>
+                                                                                    <td class="">{{total_cotadist_original}}</td>
+                                                                                    <td class="">{{total_cotadist_reforco}}</td>
+                                                                                    <td class="">{{total_cotadist}}</td>
+                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                </tr>
+                                                                            {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+
+                                                                    </div>
+                                                                <!-- /FIM DISTRIBUIÇÃO DPO -->
+
+                                                                <!-- /INICIO EXECUÇÃO DPO -->        
+                                                                    <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
+                                                                                    <th colspan="3">[Total: {{totalcotaExeDpo}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> EXECUTADO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Consum</th>
+                                                                                    <th class="th_dist"><i class="fa fa-money"></i> Saldo</th>
+                                                                                    <th class="th_dist"><i class="fa fa-key"></i></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {{#each total_cotaexedpo}} 
+                                                                                    <tr>
+                                                                                        <td class="">{{'ome.nome'}}</td>
+                                                                                        <td class="">{{total_cotaexe}}</td>
+                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
+                                                                                    </tr>
+                                                                                {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    
+                                                                <!-- /FIM EXECUÇÃODPO -->
+                                                            </div>
+
+                                                            <!-- /INICIO SALDO DPO -->
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Planejado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaDistDpo}} </i></span></small></h3>
+                                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Executado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaExeDpo}} </i></span></small></h3>
+                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Saldo:<small><span class="count_bottom"><i
+                                                                            class="valor">{{saldoFinalDpo}} <i
+                                                                                class="fa fa-sort-asc"></i></i></span></small>
+                                                            </h3>
+                                                            </br></br>
+                                                            <!-- /FIM SALDO DPO -->
+                                                        </div>
+                                                    </div>
+                                                    <!-- FIM DPO -->
+
+                                                    <!-- INICIO DIM -->
+                                                    <div>
+                                                        <div class="mail_list">
+                                                            <h3>DIM </h3>
+                                                            <div class="mail_list" style="width:100%; display: flex;">
+                                                                <!-- /INICIO DISTRIBUIÇÃO DIM -->
+                                                                    <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
+                                                                                    <th colspan="3">[Orig: {{totalcotaDistDimOrig}} | Ref: {{totalcotaDistDimRef}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> DISTRIBUIDO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Orig</th>
+                                                                                    <th class="th_dist">Ref</th>
+                                                                                    <th class="th_dist">Tt</th>
+                                                                                    <th class="th_dist">Valor Invest</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            {{#each total_cotadistdim}}
+                                                                                <tr>
+                                                                                    <td class="">{{'ome.nome'}}</td>
+                                                                                    <td class="">{{total_cotadist_original}}</td>
+                                                                                    <td class="">{{total_cotadist_reforco}}</td>
+                                                                                    <td class="">{{total_cotadist}}</td>
+                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                </tr>
+                                                                            {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+
+                                                                    </div>
+                                                                <!-- /FIM DISTRIBUIÇÃO DIM -->
+
+                                                                <!-- /INICIO EXECUÇÃO DIM -->        
+                                                                    <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
+                                                                                    <th colspan="3">[Total: {{totalcotaExeDim}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> EXECUTADO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Consum</th>
+                                                                                    <th class="th_dist"><i class="fa fa-money"></i> Saldo</th>
+                                                                                    <th class="th_dist"><i class="fa fa-key"></i></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {{#each total_cotaexedim}} 
+                                                                                    <tr>
+                                                                                        <td class="">{{'ome.nome'}}</td>
+                                                                                        <td class="">{{total_cotaexe}}</td>
+                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
+                                                                                    </tr>
+                                                                                {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    
+                                                                <!-- /FIM EXECUÇÃO DIM -->
+                                                            </div>
+
+                                                            <!-- /INICIO SALDO DIM -->
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Planejado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaDistDim}} </i></span></small></h3>
+                                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Executado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaExeDim}} </i></span></small></h3>
+                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Saldo:<small><span class="count_bottom"><i
+                                                                            class="valor">{{saldoFinalDim}} <i
+                                                                                class="fa fa-sort-asc"></i></i></span></small>
+                                                            </h3>
+                                                            </br></br>
+                                                            <!-- /FIM SALDO DIM -->
+                                                        </div>
+                                                    </div>
+                                                    <!-- FIM DIM -->
+
+
+                                                    <!-- INICIO DIRESP -->
+                                                    <div>
+                                                        <div class="mail_list">
+                                                            <h3>DIRESP </h3>
+                                                            <div class="mail_list" style="width:100%; display: flex;">
+                                                                <!-- /INICIO DISTRIBUIÇÃO DIRESP -->
+                                                                    <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
+                                                                                    <th colspan="3">[Orig: {{totalcotaDistDirespOrig}} | Ref: {{totalcotaDistDirespRef}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> DISTRIBUIDO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Orig</th>
+                                                                                    <th class="th_dist">Ref</th>
+                                                                                    <th class="th_dist">Tt</th>
+                                                                                    <th class="th_dist">Valor Invest</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            {{#each total_cotadistdiresp}}
+                                                                                <tr>
+                                                                                    <td class="">{{'ome.nome'}}</td>
+                                                                                    <td class="">{{total_cotadist_original}}</td>
+                                                                                    <td class="">{{total_cotadist_reforco}}</td>
+                                                                                    <td class="">{{total_cotadist}}</td>
+                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                </tr>
+                                                                            {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+
+                                                                    </div>
+                                                                <!-- /FIM DISTRIBUIÇÃO DIRESP -->
+
+                                                                <!-- /INICIO EXECUÇÃO DIRESP -->        
+                                                                    <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
+                                                                                    <th colspan="3">[Total: {{totalcotaExeDiresp}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> EXECUTADO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Consum</th>
+                                                                                    <th class="th_dist"><i class="fa fa-money"></i> Saldo</th>
+                                                                                    <th class="th_dist"><i class="fa fa-key"></i></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {{#each total_cotaexediresp}} 
+                                                                                    <tr>
+                                                                                        <td class="">{{'ome.nome'}}</td>
+                                                                                        <td class="">{{total_cotaexe}}</td>
+                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
+                                                                                    </tr>
+                                                                                {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    
+                                                                <!-- /FIM EXECUÇÃO DIRESP -->
+                                                            </div>
+
+                                                            <!-- /INICIO SALDO DIRESP -->
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Planejado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaDistDiresp}} </i></span></small></h3>
+                                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Executado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaExeDiresp}} </i></span></small></h3>
+                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Saldo:<small><span class="count_bottom"><i
+                                                                            class="valor">{{saldoFinalDiresp}} <i
+                                                                                class="fa fa-sort-asc"></i></i></span></small>
+                                                            </h3>
+                                                            </br></br>
+                                                            <!-- /FIM SALDO DIRESP -->
+                                                        </div>
+                                                    </div>
+                                                    <!-- FIM DIRESP -->
+
+
+                                                    <!-- INICIO DINTERI -->
+                                                    <div>
+                                                        <div class="mail_list">
+                                                            <h3>DINTER I </h3>
+                                                            <div class="mail_list" style="width:100%; display: flex;">
+                                                                <!-- /INICIO DISTRIBUIÇÃO DINTERI -->
+                                                                    <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
+                                                                                    <th colspan="3">[Orig: {{totalcotaDistDinteriOrig}} | Ref: {{totalcotaDistDinteriRef}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> DISTRIBUIDO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Orig</th>
+                                                                                    <th class="th_dist">Ref</th>
+                                                                                    <th class="th_dist">Tt</th>
+                                                                                    <th class="th_dist">Valor Invest</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            {{#each total_cotadistdinteri}}
+                                                                                <tr>
+                                                                                    <td class="">{{'ome.nome'}}</td>
+                                                                                    <td class="">{{total_cotadist_original}}</td>
+                                                                                    <td class="">{{total_cotadist_reforco}}</td>
+                                                                                    <td class="">{{total_cotadist}}</td>
+                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                </tr>
+                                                                            {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+
+                                                                    </div>
+                                                                <!-- /FIM DISTRIBUIÇÃO DINTERI -->
+
+                                                                <!-- /INICIO EXECUÇÃO DINTERI -->        
+                                                                    <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
+                                                                                    <th colspan="3">[Total: {{totalcotaExeDinteri}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> EXECUTADO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Consum</th>
+                                                                                    <th class="th_dist"><i class="fa fa-money"></i> Saldo</th>
+                                                                                    <th class="th_dist"><i class="fa fa-key"></i></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {{#each total_cotaexedinteri}} 
+                                                                                    <tr>
+                                                                                        <td class="">{{'ome.nome'}}</td>
+                                                                                        <td class="">{{total_cotaexe}}</td>
+                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
+                                                                                    </tr>
+                                                                                {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    
+                                                                <!-- /FIM EXECUÇÃO DINTERI -->
+                                                            </div>
+
+                                                            <!-- /INICIO SALDO DINTERI -->
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Planejado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaDistDinteri}} </i></span></small></h3>
+                                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Executado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaExeDinteri}} </i></span></small></h3>
+                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Saldo:<small><span class="count_bottom"><i
+                                                                            class="valor">{{saldoFinalDinteri}} <i
+                                                                                class="fa fa-sort-asc"></i></i></span></small>
+                                                            </h3>
+                                                            </br></br>
+                                                            <!-- /FIM SALDO DINTERI -->
+                                                        </div>
+                                                    </div>
+                                                    <!-- FIM DINTERI -->
+
+                                                    <!-- INICIO DINTERI -->
+                                                    <div>
+                                                        <div class="mail_list">
+                                                            <h3>DINTER II </h3>
+                                                            <div class="mail_list" style="width:100%; display: flex;">
+                                                                <!-- /INICIO DISTRIBUIÇÃO DINTERII -->
+                                                                    <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
+                                                                                    <th colspan="3">[Orig: {{totalcotaDistDinteriiOrig}} | Ref: {{totalcotaDistDinteriiRef}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> DISTRIBUIDO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Orig</th>
+                                                                                    <th class="th_dist">Ref</th>
+                                                                                    <th class="th_dist">Tt</th>
+                                                                                    <th class="th_dist">Valor Invest</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            {{#each total_cotadistdinterii}}
+                                                                                <tr>
+                                                                                    <td class="">{{'ome.nome'}}</td>
+                                                                                    <td class="">{{total_cotadist_original}}</td>
+                                                                                    <td class="">{{total_cotadist_reforco}}</td>
+                                                                                    <td class="">{{total_cotadist}}</td>
+                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                </tr>
+                                                                            {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+
+                                                                    </div>
+                                                                <!-- /FIM DISTRIBUIÇÃO DINTERII -->
+
+                                                                <!-- /INICIO EXECUÇÃO DINTERII -->        
+                                                                    <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
+                                                                        <table style="width:100%; font-size: 11px">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
+                                                                                    <th colspan="3">[Total: {{totalcotaExeDinterii}}]</th>
+                                                                                </tr>
+                                                                                <tr class="th_dist">
+                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                    <th class="th_dist" colspan="4"><i class="fa fa-level-up"></i> EXECUTADO</th>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th class="th_dist">Und</th>
+                                                                                    <th class="th_dist">Consum</th>
+                                                                                    <th class="th_dist"><i class="fa fa-money"></i> Saldo</th>
+                                                                                    <th class="th_dist"><i class="fa fa-key"></i></th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {{#each total_cotaexedinterii}} 
+                                                                                    <tr>
+                                                                                        <td class="">{{'ome.nome'}}</td>
+                                                                                        <td class="">{{total_cotaexe}}</td>
+                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
+                                                                                    </tr>
+                                                                                {{/each}}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    
+                                                                <!-- /FIM EXECUÇÃO DINTERII -->
+                                                            </div>
+
+                                                            <!-- /INICIO SALDO DINTERII -->
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Planejado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaDistDinterii}} </i></span></small></h3>
+                                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Executado:<small><span class="count_bottom"><i
+                                                                            class="valor">{{valorCotaExeDinterii}} </i></span></small></h3>
+                                                            <hr style="margin-bottom: 2px; margin-top: 2px;"></hr>
+                                                            <h3 style="margin-bottom: 2px; margin-right: 2px;">
+                                                                Saldo:<small><span class="count_bottom"><i
+                                                                            class="valor">{{saldoFinalDinterii}} <i
+                                                                                class="fa fa-sort-asc"></i></i></span></small>
+                                                            </h3>
+                                                            </br></br>
+                                                            <!-- /FIM SALDO DINTERII -->
+                                                        </div>
+                                                    </div>
+                                                    <!-- FIM DINTERII -->
+
+                                                
+                                                   
+
+                                                </div>
+                                                <!-- /FIM DIRETORIAS -->
+
+                                                <!-- LISTA GERAL DOS EVENTOS -->
+                                                <div class="col-sm-8 mail_view">
+                                                    <div class="inbox-body">
+                                                        <div class="view-mail card-box table-responsive">
+                                                            
+                                                            <a href="/diarias/add" type="button" class="btn btn-sm btn_event btn-block" type="button">ADICIONAR EVENTOS</a>
+                                                            <table id="datatable" style="width:100%; font-size: 11px">
+                                                                {{>_msgAdm}}
+                                                                <thead>
+                                                                    <tr class="th_event">
+                                                                        
+                                                                        <th>Unidade</th>
+                                                                        <th>Evento</th>
+                                                                        <th>Operação</th>
+                                                                        <th>Cotas</th>
+                                                                        <th>Fpg</th>
+                                                                        <th>Anotações</th>
+                                                                        <th>Ações</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {{#each diarias}} 
+                                                                        <tr>
+                                                                            <td>{{ome.nome}}</td>
+                                                                            <td>{{evento}}</td>
+                                                                            <td>{{operacao}}</td>
+                                                                            <td>{{cotadist}}</td>
+                                                                            <td>{{idfpgOme.nome}}</td>
+                                                                            <td>{{obs}}</td>
+                                                                            <td>
+                                                                                <a href="" title="Ver Detalhes"><i
+                                                                                        class="fa fa-eye"></i></a>
+                                                                                <a href="/diarias/edit/{{id}}" title="Editar Registro"><i
+                                                                                        class="fa fa-edit"></i></a>
+                                                                                <a href="/diarias/delete/{{id}}"
+                                                                                    onclick="return confirm('Tem certeza que deseja excluir este registro?')"
+                                                                                    title="Excluir Registro"><i
+                                                                                        class="fa fa-trash text-danger"></i></a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    {{/each}}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- /LISTA GERAL DOS EVENTOS -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+
+<!-- /FORMATAR A CELULA NO FORMATO DE MOEDA BRASILEIRA -->
+<script>
+    var elementos = document.querySelectorAll('.valor');
+    elementos.forEach(function(elemento) {
+    var valor = parseFloat(elemento.textContent);
+    elemento.textContent = valor.toLocaleString('pt-BR', {style: 'currency',currency: 'BRL'});
+    });
+</script>

@@ -1,0 +1,240 @@
+<style>
+    th,
+    td {
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .td_laranja {
+        color: orange;
+    }
+
+    .td_verde {
+        color: green;
+    }
+
+    .td_vermelho {
+        color: red;
+    }
+
+    .contas {
+        color: orange;
+    }
+
+    .td_unidades {
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .td_unidades_right {
+        border-bottom: 1px solid #ddd;
+        text-align: right;
+    }
+
+    .th_dist {
+        background-color: #015050;
+        color: white;
+        text-align: center;
+    }
+
+    .th_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    .btn_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+</style>
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+
+                    <div class="x_title">
+                        <h2>Eventos <small>DIARIAS</small></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a href="/diarias?page=1"><i class="fa fa-bars text-primary"></i></a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        {{>_msgAdm}}
+                        <div class="col-md-1 col-sm-1  profile_left">
+                            <div class="profile_img">
+                                <div id="crop-avatar">
+                                    <img class="img-responsive avatar-view" src="/images/util/pjes_icone.png"
+                                        width="90px" height="90px" alt="Avatar" title="Change the avatar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-11 col-sm-11 ">
+                            <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                <!-- start recent activity -->
+                                <div class="col-md-12 ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2>Editar Evento</h2>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <br />
+                                            <form class="form-label-left input_mask" action="/diarias/edit" method="post">
+                                                <input type="hidden" name="id" id="id" value="{{data.id}}">
+
+                                                <input type="hidden" name="iduser" id="iduser" value="{{profile.id}}">
+
+                                                <div class='col-sm-6'>
+                                                    Nome do Evento
+                                                    <div class="form-group">
+                                                        <input name="evento" id="evento" type="text" required
+                                                        class="form-control"
+                                                        placeholder="Nome da Evento" value="{{data.evento}}">
+                                                    
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-2'>
+                                                    Operação
+                                                    <div class="form-group">
+                                                        <select name="operacao" id="operacao" class="form-control" required>
+                                                            <option>ORIGINAL</option>
+                                                            <option>REFORCO</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-2'>
+                                                    Unidade
+                                                    <div class="form-group">
+                                                        <select name="idome" id="idome" class="form-control" required>
+                                                        <option value={{#if
+                                                            data.ome.dataValues.id}}{{data.ome.dataValues.id}}{{else}}""{{/if}}
+                                                            hidden="hidden" selected="selected">
+                                                            {{#if data.ome.dataValues.id}}
+                                                            {{data.ome.dataValues.nome}}
+                                                            {{else}}
+                                                            Selecione
+                                                            {{/if}}
+                                                        </option>
+                                                        {{#each data.omes}}
+                                                        <option value="{{dataValues.id}}">
+                                                            {{dataValues.nome}}</option>
+                                                        {{/each}}
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-2'>
+                                                    Cotas
+                                                    <div class="form-group">
+                                                        <input name="cotadist" id="cotadist" type="number" required
+                                                        class="form-control"
+                                                        placeholder="Cotas" value="{{data.cotadist}}">
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-6'>
+                                                    Mes
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='myDatepicker3'>
+                                                            <input type='text' class="form-control" name="mes" id="mes" readonly
+                                                                tabindex="-1"
+                                                                value="{{nomeMes}}"/>
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-6'>
+                                                    Ano
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='myDatepicker3'>
+                                                            <input type='text' class="form-control" name="ano" id="ano" readonly
+                                                                tabindex="-1"
+                                                                value="{{nomeAno}}"/>
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-6'>
+                                                    Fonte pagadora
+                                                    <div class="form-group">
+                                                        <select name="idfpg" id="idfpg" class="form-control">
+                                                                <option value={{#if data.idfpgOme.dataValues.id}}{{data.idfpgOme.dataValues.id}}{{else}}""{{/if}} hidden="hidden" selected="selected">
+                                                                    {{#if data.idfpgOme.dataValues.id}}
+                                                                        {{data.idfpgOme.dataValues.nome}}
+                                                                    {{else}}
+                                                                        Selecione
+                                                                    {{/if}}
+                                                                </option>
+                                                                    {{#each data.omes}}
+                                                                <option value="{{dataValues.id}}">{{dataValues.nome}}</option>
+                                                                    {{/each}}
+                                                            </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-6'>
+                                                    SEI / CV
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='myDatepicker3'>
+                                                            <input type='text' class="form-control" name="sei" id="sei"
+                                                                tabindex="-1" placeholder="3900032205.000289/2024-22"
+                                                                value="{{data.sei}}"/>
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-book"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <label class="col-form-label col-md-3 col-sm-3 ">Anotações<span
+                                                        class="required"></span></label>
+                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                    <textarea style="height: 150px;"
+                                                        class="resizable_textarea form-control" name="obs" id="obs"
+                                                        tabindex="-1"
+                                                        placeholder="Descreva aqui qualquer informações adcionais"
+                                                        >{{data.obs}}</textarea>
+                                                </div>
+
+                                                <div class=""></div>
+                                                <div>
+                                                    <button type="submit" class="btn btn-success">Salvar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end recent activity -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->

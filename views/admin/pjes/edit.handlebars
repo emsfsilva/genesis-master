@@ -1,0 +1,290 @@
+<style>
+    th,
+    td {
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .td_laranja {
+        color: orange;
+    }
+
+    .td_verde {
+        color: green;
+    }
+
+    .td_vermelho {
+        color: red;
+    }
+
+    .contas {
+        color: orange;
+    }
+
+    .td_unidades {
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .td_unidades_right {
+        border-bottom: 1px solid #ddd;
+        text-align: right;
+    }
+
+    .th_dist {
+        background-color: #015050;
+        color: white;
+        text-align: center;
+    }
+
+    .th_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    .btn_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+</style>
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+
+                    <div class="x_title">
+                        <h2>Eventos <small>PJES</small></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a href="/pjes?page=1"><i class="fa fa-bars text-primary"></i></a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        {{>_msgAdm}}
+                        <div class="col-md-1 col-sm-1  profile_left">
+                            <div class="profile_img">
+                                <div id="crop-avatar">
+                                    <img class="img-responsive avatar-view" src="/images/util/pjes_icone.png"
+                                        width="90px" height="90px" alt="Avatar" title="Change the avatar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-11 col-sm-11 ">
+                            <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                <!-- start recent activity -->
+                                <div class="col-md-12 ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2>Editar Evento</h2>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+
+                                            <br />
+                                            <form class="form-label-left input_mask" action="/pjes/edit" method="post">
+                                                <input type="hidden" name="id" id="id" value="{{data.id}}">
+
+                                                <input type="hidden" name="iduser" id="iduser" value="{{profile.id}}">
+
+                                                <label class="col-form-label col-md-3 col-sm-3 ">Nome do Evento<span
+                                                        class="required"></span></label>
+                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                    <input name="evento" id="evento" type="text"
+                                                        class="form-control has-feedback-left"
+                                                        placeholder="Nome da Evento" value="{{data.evento}}">
+                                                    <span class="fa fa-book form-control-feedback left"
+                                                        aria-hidden="true"></span>
+                                                </div>
+
+                                                <div class='col-sm-6'>
+                                                    Operação
+                                                    <div class="form-group">
+                                                        <style>
+                                                            select option:disabled {
+                                                                background-color: #ddd;
+                                                                color: #666;
+                                                            }
+                                                        </style>
+                                                        <select name="operacao" id="operacao" class="form-control">
+                                                            <option value="{{data.operacao}}" hidden>{{data.operacao}}</option>
+                                                            <optgroup label="PMPE">
+                                                                <option value="PJES GOVERNO REGULAR">PJES GOVERNO REGULAR</option>
+                                                                <option value="PJES GOVERNO REMANESCENTE">PJES GOVERNO REMANESCENTE</option>
+                                                            </optgroup>
+                                                            <optgroup label="CONVENIOS">
+                                                                <option value="PJES CTM (BRT)">PJES CTM (BRT)</option>
+                                                                <option value="PJES PATRULHA ESCOLAR">PJES PATRULHA ESCOLAR</option>
+                                                                <option value="PJES OP ENEM">PJES OP ENEM</option>
+                                                                <option value="PJES OPER CONVIVÊNCIA" disabled>PJES OPER CONVIVÊNCIA</option>
+                                                                <option value="PJES ALEPE" disabled>PJES ALEPE</option>
+                                                                <option value="PJES TJPE" disabled>PJES TJPE</option>
+                                                                <option value="PJES MPPE" disabled>PJES MPPE</option>
+                                                                <option value="PJES PREFEITURA DE RECIFE" disabled>PJES PREFEITURA DE RECIFE</option> 
+                                                                <option value="PJES CBTU" disabled>PJES CBTU</option>
+                                                                <option value="PJES CPRH" disabled>PJES CPRH</option>
+                                                                <option value="PJES SEMOC PCR" disabled>PJES SEMOC PCR</option>
+                                                            </optgroup>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <script>
+                                                    var valorOperacao = "{{ dataValues.operacao }}";
+                                                    $("#operacao").val(valorOperacao);
+                                                </script>
+
+                                                <div class='col-sm-6'>
+                                                    Unidade
+                                                    <div class="form-group">
+                                                        <select name="idome" id="idome" class="form-control">
+                                                            <option value={{#if
+                                                            data.ome.dataValues.id}}{{data.ome.dataValues.id}}{{else}}""{{/if}}
+                                                            hidden="hidden" selected="selected">
+                                                            {{#if data.ome.dataValues.id}}
+                                                            {{data.ome.dataValues.nome}}
+                                                            {{else}}
+                                                            Selecione
+                                                            {{/if}}
+                                                        </option>
+                                                        {{#each data.omes}}
+                                                        <option value="{{dataValues.id}}">
+                                                            {{dataValues.nome}}</option>
+                                                        {{/each}}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-md-6 col-sm-6  form-group has-feedback">
+                                                    <input name="cotaofdist" id="cotaofdist" type="number"
+                                                        class="form-control has-feedback-left" placeholder="Oficiais"
+                                                        value="{{data.cotaofdist}}">
+                                                    <span class="fa fa-star form-control-feedback left"
+                                                        aria-hidden="true"></span>
+                                                </div>
+
+                                                <div class="col-md-6 col-sm-6  form-group has-feedback">
+                                                    <input name="cotaprcdist" id="cotaprcdist" type="number"
+                                                        class="form-control has-feedback-left" placeholder="Praças"
+                                                        value="{{data.cotaprcdist}}">
+                                                    <span class="fa fa-angle-double-up form-control-feedback left"
+                                                        aria-hidden="true"></span>
+                                                </div>
+
+                                                <div class='col-sm-4'>
+                                                    Mes
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='myDatepicker3'>
+                                                            <input type='text' class="form-control" name="mes" id="mes" readonly
+                                                                tabindex="-1"
+                                                                value="{{nomeMes}}"/>
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-4'>
+                                                    Ano
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='myDatepicker2'>
+                                                            <select class="select2_single form-control" name="ano"
+                                                                id="ano" tabindex="-1">
+                                                                <option>2024</option>
+                                                                <option>2025</option>
+                                                                <option>2026</option>
+                                                                <option>2027</option>
+                                                                <option>2028</option>
+                                                            </select>
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class='col-sm-4'>
+                                                    SEI / CV
+                                                    <div class="form-group">
+                                                        <div class='input-group date' id='myDatepicker3'>
+                                                            <input type='text' class="form-control" name="sei" id="sei"
+                                                                tabindex="-1" placeholder="3900032205.000289/2024-22"
+                                                                value="{{data.sei}}"/>
+                                                            <span class="input-group-addon">
+                                                                <span class="fa fa-book"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <label class="col-form-label col-md-3 col-sm-3 ">Anotações<span
+                                                        class="required"></span></label>
+                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                    <textarea style="height: 150px;"
+                                                        class="resizable_textarea form-control" name="obs" id="obs"
+                                                        tabindex="-1"
+                                                        placeholder="Descreva aqui qualquer informações adcionais"
+                                                        >{{data.obs}}</textarea>
+                                                </div>
+
+                                                <div class=""></div>
+                                                <div>
+
+                                                    <button type="submit" class="btn btn-success">Salvar</button>
+                                                </div>
+                                            </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end recent activity -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->

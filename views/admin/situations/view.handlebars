@@ -1,0 +1,95 @@
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Situações <small>Detalhes</small></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a href="/situations?page=1"><i class="fa fa-bars text-primary"></i></a></li>
+                            <li><a href="/situations/edit/{{situation.dataValues.id}}"><i class="fa fa-edit text-warning"></i></a>
+                            </li>
+                            <li><a href="/situations/delete/{{situation.dataValues.id}}"
+                                    onclick="return confirm('Tem certeza que deseja excluir este registro?')"><i
+                                        class="fa fa-trash text-danger"></i></a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        {{>_msgAdm}}
+                        <div class="col-md-2 col-sm-2  profile_left">
+                            <div class="profile_img">
+                                <div id="crop-avatar">
+                                    <img class="img-responsive avatar-view" src="/images/util/config.png" width="150px"
+                                        height="150px" alt="Avatar" title="Change the avatar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-10 ">
+                            <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                <!-- start recent activity -->
+                                <div class="col-md-12 ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2><small>Informações</small></h2>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <br />
+                                            <form class="form-horizontal form-label-left">
+                                                <div class="form-group row ">
+                                                    <label class="control-label col-md-3 col-sm-3 ">Id</label>
+                                                    <div class="col-md-9 col-sm-9 ">
+                                                        <label class="control-label">
+                                                            <a>{{situation.dataValues.id}}</a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="control-label col-md-3 col-sm-3 ">Nome
+                                                    </label>
+                                                    <div class="col-md-9 col-sm-9 ">
+                                                        <label class="control-label">
+                                                            <a>{{situation.dataValues.nameSituation}}</a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label class="control-label col-md-3 col-sm-3 ">Cadastrado
+                                                    </label>
+                                                    <div class="col-md-9 col-sm-9 ">
+                                                        <label class="control-label">
+                                                            <a>{{#formatDateTime
+                                                                situation.dataValues.createdAt}}{{/formatDateTime}}</a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="control-label col-md-3 col-sm-3 ">Editado
+                                                    </label>
+                                                    <div class="col-md-9 col-sm-9 ">
+                                                        <label class="control-label">
+                                                            <a>{{#formatDateTime
+                                                                situation.dataValues.updatedAt}}{{/formatDateTime}}</a>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ln_solid"></div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end recent activity -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->

@@ -1,0 +1,200 @@
+<script src="https://cdn.jsdelivr.net/npm/handlebars/dist/handlebars.min.js"></script>
+
+<script>
+    Handlebars.registerHelper('eq', function (a, b) {
+        return a === b;
+    });
+</script>
+
+
+<div class="col-md-3 left_col">
+  <div class="left_col scroll-view">
+    <div class="navbar nav_title" style="border: 0;">
+      <a style="padding-left: 15px;" class="site_title">
+        <img href="index.php" class="img-circle img-responsive" src="/images/logo/dpo_logo.png" width="40px"
+          height="40px" class="img-circle profile_img">
+        <span>Genesis</span>
+      </a>
+    </div>
+
+    <div class="col-md-12 col-sm-12 col-xs-12 clearfix"></div>
+
+    <!-- menu profile quick info -->
+    <div class="profile clearfix">
+      <div class="col-md-4 col-sm-4 col-xs-4 profile_pic" style="margin-top: 15px;">
+        {{#if profile.image}}
+        <img class="img-circle img-responsive" src="/images/users/{{profile.image}}" width="50px" height="50px"
+          alt="..." class="img-circle profile_img">
+        {{else}}
+        <img class="img-circle img-responsive" src="/images/users/user.jpg" width="50px" height="50px" alt="..."
+          class="img-circle profile_img">
+        {{/if}}
+      </div>
+      <div class="col-md-8 col-sm-8 col-xs-8 profile_pic profile_info" style="padding: 1px 10px 10px;">
+        <span>Bem-vindo,</span>
+        <h2>{{profile.name}}, Adm</h2>
+        <h2>{{profile.ome.dataValues.nome}}</h2>
+      </div>
+    </div>
+    <!-- /menu profile quick info -->
+    <br />
+    <!-- sidebar menu -->
+    <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+      <div class="menu_section">
+        <h3>Geral</h3>
+        <ul class="nav side-menu">
+  
+            {{#if (eq profile.omeId 1)}}
+              <li><a href="/dashboard"><i class="fa fa-home"></i>Dashboard</a></li>
+            {{else}}
+              <li><a href="/unidade/dashboard"><i class="fa fa-home"></i>Dashboard</a></li>
+            {{/if}}
+
+            {{#if (eq profile.omeId 1)}}
+              <li><a href="/users?page=1"><i class="fa fa-users"></i>Usuarios</a></li>
+            {{else}}
+              <li><a href="/unidade/unidadeusers?page=1"><i class="fa fa-users"></i>Usuarios</a></li>
+            {{/if}}
+
+              <!--<li><a href="/situations?page=1"><i class="fa fa-check"></i>Situações</a></li>-->
+
+            {{#if (eq profile.omeId 1)}}
+              <li><a href="/consultarEscalas"><i class="fa fa-thumbs-up"></i>Escala</a></li>
+            {{else}}
+              <li><a href="/unidade/unidadeconsultarEscalas"><i class="fa fa-thumbs-up"></i>Escala</a></li>
+            {{/if}}
+            
+        </ul>
+      </div>
+      <div class="menu_section">
+        <h3>Operações</h3>
+        <ul class="nav side-menu">
+          <li><a><i class="fa fa-sitemap"></i> Pjes <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+              <li><a>2023<span class="fa fa-chevron-down"></span></a></li>
+              <li><a>2024<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  {{#if profile.omeId}}
+                    {{#if (eq profile.omeId 1)}}
+                      <li class="sub_menu"><a href="/pjes?mes=JAN&ano=2024">Jan_24</a></li>
+                      <li><a href="/pjes?mes=FEV&ano=2024">Fev_24</a></li>
+                      <li><a href="/pjes?mes=MAR&ano=2024">Mar_24</a></li>
+                      <li><a href="/pjes?mes=ABR&ano=2024">Abr_24</a></li>
+                      <li><a href="/pjes?mes=MAI&ano=2024">Mai_24</a></li>
+                      <li><a href="/pjes?mes=JUN&ano=2024">Jun_24</a></li>
+                      <li><a href="/pjes?mes=JUL&ano=2024">Jul_24</a></li>
+                      <li><a href="/pjes?mes=AGO&ano=2024">Ago_24</a></li>
+                      <li><a href="/pjes?mes=SET&ano=2024">Set_24</a></li>
+                      <li><a href="/pjes?mes=OUT&ano=2024">Out_24</a></li>
+                      <li><a href="/pjes?mes=NOV&ano=2024">Nov_24</a></li>
+                      <li><a href="/pjes?mes=DEZ&ano=2024">Dez_24</a></li>
+                    {{/if}}
+
+                      <!--ACESSO DAS UNIDADES -->
+                      <li class="sub_menu"><a href="/unidade/unidadepjes?mes=JAN&ano=2024">Jan_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=FEV&ano=2024">Fev_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=MAR&ano=2024">Mar_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=ABR&ano=2024">Abr_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=MAI&ano=2024">Mai_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=JUN&ano=2024">Jun_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=JUL&ano=2024">Jul_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=AGO&ano=2024">Ago_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=SET&ano=2024">Set_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=OUT&ano=2024">Out_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=NOV&ano=2024">Nov_24</a></li>
+                      <li><a href="/unidade/unidadepjes?mes=DEZ&ano=2024">Dez_24</a></li>
+                      <!--ACESSO DAS UNIDADES -->
+                    {{else}}
+                    <!-- Caso profile.omeId não esteja definido ou seja falso -->
+                    <!-- Inserir comportamento padrão aqui, se necessário -->
+                  {{/if}}
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a><i class="fa fa-line-chart"></i> Diarias <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+              <li><a>2023<span class="fa fa-chevron-down"></span></a></li>
+              <li><a>2024<span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                  {{#if profile.omeId}}
+                    {{#if (eq profile.omeId 1)}}
+                      <li class="sub_menu"><a href="/diarias?mes=JAN&ano=2024">Jan_24</a></li>
+                      <li><a href="/diarias?mes=FEV&ano=2024">Fev_24</a></li>
+                      <li><a href="/diarias?mes=MAR&ano=2024">Mar_24</a></li>
+                      <li><a href="/diarias?mes=ABR&ano=2024">Abr_24</a></li>
+                      <li><a href="/diarias?mes=MAI&ano=2024">Mai_24</a></li>
+                      <li><a href="/diarias?mes=JUN&ano=2024">Jun_24</a></li>
+                      <li><a href="/diarias?mes=JUL&ano=2024">Jul_24</a></li>
+                      <li><a href="/diarias?mes=AGO&ano=2024">Ago_24</a></li>
+                      <li><a href="/diarias?mes=SET&ano=2024">Set_24</a></li>
+                      <li><a href="/diarias?mes=OUT&ano=2024">Out_24</a></li>
+                      <li><a href="/diarias?mes=NOV&ano=2024">Nov_24</a></li>
+                      <li><a href="/diarias?mes=DEZ&ano=2024">Dez_24</a></li>
+                    {{/if}}
+
+                      <!--ACESSO DAS UNIDADES -->
+                      <li class="sub_menu"><a href="/unidade/unidadediarias?mes=JAN&ano=2024">Jan_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=FEV&ano=2024">Fev_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=MAR&ano=2024">Mar_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=ABR&ano=2024">Abr_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=MAI&ano=2024">Mai_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=JUN&ano=2024">Jun_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=JUL&ano=2024">Jul_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=AGO&ano=2024">Ago_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=SET&ano=2024">Set_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=OUT&ano=2024">Out_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=NOV&ano=2024">Nov_24</a></li>
+                      <li><a href="/unidade/unidadediarias?mes=DEZ&ano=2024">Dez_24</a></li>
+                      <!--ACESSO DAS UNIDADES -->
+                    {{else}}
+                    <!-- Caso profile.omeId não esteja definido ou seja falso -->
+                    <!-- Inserir comportamento padrão aqui, se necessário -->
+                  {{/if}}
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="menu_section">
+        <h3>Mobilizações</h3>
+        <ul class="nav side-menu">
+          <li><a><i class="fa fa-umbrella"></i> Carnaval <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+              <li><a>Blocos</a></li>
+            </ul>
+          </li>
+          <li><a><i class="fa fa-fire"></i> São João <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+            </ul>
+          </li>
+          <li><a><i class="fa fa-windows"></i> Eleições <span class="fa fa-chevron-down"></span></a>
+            <ul class="nav child_menu">
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+    <!-- /sidebar menu -->
+
+    <!-- /menu footer buttons -->
+    <div class="sidebar-footer hidden-small">
+      <a data-toggle="tooltip" data-placement="top" title="Settings">
+        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+      </a>
+      <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+        <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+      </a>
+      <a data-toggle="tooltip" data-placement="top" title="Lock">
+        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+      </a>
+      <a data-toggle="tooltip" data-placement="top" title="Logout">
+        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+      </a>
+    </div>
+    <!-- /menu footer buttons -->
+  </div>
+</div>

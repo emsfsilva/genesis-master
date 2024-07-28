@@ -1,0 +1,131 @@
+
+<!-- page content -->
+    <div class="right_col" role="main">
+        <div class="">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Pesquisar Escala</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <form class="form-horizontal form-label-left" action="/consultarEscalas/consultar" method="GET">
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Matricula</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="idInput" name="matricula" required placeholder="0000000">
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-primary">Buscar</button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+              <div class="x_content">
+                {{#if escalasAgrupadas}}
+                  {{#each escalasAgrupadas}}
+                    <div class="accordion" id="accordion-{{@index}}" role="tablist" aria-multiselectable="true">
+                      <div class="panel">
+                        <a class="panel-heading" role="tab" id="heading-{{@index}}" data-toggle="collapse" data-parent="#accordion-{{@index}}" href="#collapse-{{@index}}" aria-expanded="true" aria-controls="collapse-{{@index}}">
+                          <h4 class="panel-title">{{@key}} 2024</h4>
+                        </a>
+                        <div id="collapse-{{@index}}" class="panel-collapse collapse in table-responsive" role="tabpanel" aria-labelledby="heading-{{@index}}">
+                          <div class="panel-body">
+                            <table class="table table-striped table-bordered datatable-fixed-header jambo_table" style="width:100%; font-size: 11px">
+                              <thead>
+                                <tr>
+                                  <th>DATA</th>
+                                  <th>OME</th>
+                                  <th>INFORMAÇÕES DO SERVIÇO</th>
+                                  <th>ID DO POLICIAL</th>
+                                  <th>MOD</th>
+                                  <th>ANOTAÇÕES</th>
+                                  <td><i class="fa fa-check-square-o"></i></td>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {{#each this}}
+                                  <tr>
+                                    <td>{{this.data_inicio}} | {{this.hora_inicio}} às {{this.hora_fim}}</td>
+                                    <td>{{this.ome.nome}}</td>
+                                    <td scope="row">{{this.pje.evento}}, LOCAL AP: {{this.localap}}  </td>
+                                    <td>{{this.pg}} {{this.matricula}} {{this.nome}} {{this.ome_sgpm}} {{this.telefone}}</td>
+                                    <td>{{this.modalidade}}</td>
+                                    <td>{{this.anotacoes}}</td>
+                                    <td>
+                                      <a type="button" data-toggle="modal" data-target=".bs-example-modal-sm">
+                                        <input type="checkbox" value="">
+                                      </a>
+                                    </td>
+                                  </tr>
+                                {{/each}}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {{else}}
+                    <div>
+                      <h2>Nenhuma Escala Encontrada</h2>
+                      <p>Não foram encontradas escalas para a matrícula informada.</p>
+                    </div>
+                  {{/each}}
+                {{/if}}              
+              </div>
+
+                  <!-- MODAL TIRAR ALTERAÇÃO -->
+                  <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                      <div class="modal-content">
+
+                        <div class="modal-header">
+                          <h4 class="modal-title" id="myModalLabel2">Checagem</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <!-- start project-detail sidebar -->
+                    <div class="col-md-12 col-sm-12  ">
+
+                      <section class="panel">
+                        <div class="panel-body">
+                          <ul class="list-unstyled project_files">
+                            <li><a href=""><i class="fa fa-user"></i> {{profile.name}}</a></li>
+                            <li><a href=""><i class="fa fa-barcode"></i> {{profile.matricula}}</a></li>
+                            <li><a href=""><i class="fa fa-university"></i> {{profile.ome.dataValues.nome}}</a></li>
+                            <hr>
+                            <li><a href=""><i class="fa fa-location-arrow"></i> Endereço: Indisponviel</a>
+                            </li>
+                            <li><a href=""><i class="fa fa-calendar"></i> Data: Indisponviel</a>
+                            </li>
+                            <li><a href=""><i class="fa fa-clock-o"></i> Hora: Indisponviel</a>
+                            </li>
+                          </ul>
+                          <br />
+                      </section>
+
+                      <input type="password" class="form-control" placeholder="Digite sua Senha">
+
+                    </div>
+                    <!-- end project-detail sidebar -->
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                          <button onclick="return confirm('Usuario sem autorização')" type="button" class="btn btn-primary">Salvar</button>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /MODAL TIRAR ALTERAÇÃO -->
+
+                </div>
+            </div>  
+        </div>
+    </div>
+<!-- /page content -->
+

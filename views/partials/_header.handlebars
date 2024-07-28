@@ -1,0 +1,31 @@
+<!-- top navigation -->
+<div class="top_nav">
+  <div class="nav_menu">
+      <div class="nav toggle">
+        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+      </div>
+      <nav class="nav navbar-nav">
+      <ul class=" navbar-right">
+        <li class="nav-item dropdown open" style="padding-left: 15px;">
+          <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+            <!-- Current avatar -->
+            {{#if profile.image}}
+                <img class="img-responsive avatar-view" src="/images/users/{{profile.image}}" alt="Avatar" title="Change the avatar">{{profile.name}}
+              {{else}}
+                <img class="img-responsive avatar-view" src="/images/users/user.jpg" alt="Avatar" title="Change the avatar">{{profile.name}}
+            {{/if}}
+          </a>
+          <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+            {{#if (eq profile.omeId 1)}}
+                <a class="dropdown-item"  href="/profile"> Perfil</a>
+            {{else}}
+                <a class="dropdown-item"  href="/unidade/unidadeprofile"> Perfil</a>
+            {{/if}}
+            <a class="dropdown-item"  href="/login/logout"><i class="fa fa-sign-out pull-right"></i> Sair</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<!-- /top navigation -->

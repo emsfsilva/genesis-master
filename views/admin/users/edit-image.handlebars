@@ -1,0 +1,93 @@
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Usuario <small>Editar Imagem</small></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a href="/users?page=1"><i class="fa fa-bars text-primary"></i></a></li>
+                            <li><a href=""><i class="fa fa-edit"></i></a></li>
+                            <li><a href=""><i class="fa fa-key"></i></a></li>
+                            <li><a href=""><i class="fa fa-image"></i></a></li>
+                            <li><a href=""><i class="fa fa-trash"></i></a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <form class="form-horizontal form-label-left" action="/users/edit-image" method="post"
+                            enctype="multipart/form-data">
+                            {{>_msgAdm}}
+                            <div class="col-md-2 col-sm-2  profile_left">
+                                <div class="profile_img">
+                                    <div id="crop-avatar">
+                                        <!-- Current avatar -->
+                                        {{#if data.imageOld}}
+                                        <span id="preview-img">
+                                            <img src="/images/users/{{data.imageOld}}" alt="Imagem"
+                                                class="view-image-user">
+                                        </span>
+                                        {{else}}
+                                        <span id="preview-img">
+                                            <img src="/images/users/user.jpg" alt="Imagem" class="view-image-user">
+                                        </span>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-10 col-sm-10 ">
+                                <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                    <div id="myTabContent" class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active " id="tab_content1"
+                                            aria-labelledby="home-tab">
+                                            <!-- start recent activity -->
+                                            <div class="col-md-12 ">
+                                                <div class="x_panel">
+                                                    <div class="x_title">
+                                                        <h2><small>Informações</small></h2>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <br />
+                                                        <input type="hidden" name="id" id="id" value="{{data.id}}">
+                                                        <input type="hidden" name="imageOld" id="imageOld"
+                                                            value="{{data.imageOld}}">
+
+                                                        <div class="form-group row ">
+                                                            <label class="control-label col-md-3 col-sm-3 ">Imagem
+                                                                (500X500)</label>
+                                                            <div class="col-md-9 col-sm-9 ">
+                                                                <input name="image" id="image" type="file"
+                                                                    class="form-control"
+                                                                    onchange="inputFilePriviewImg()">
+                                                            </div>
+                                                        </div>
+                                                        <div class="ln_solid"></div>
+                                                        <div class="form-group">
+                                                            <div class="col-md-9 col-sm-9  offset-md-3">
+                                                                <button type="button"
+                                                                    class="btn btn-primary">Cancel</button>
+                                                                <input type="submit" value="Editar"
+                                                                    class="btn btn-success" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- end recent activity -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- /page content -->

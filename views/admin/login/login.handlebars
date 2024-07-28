@@ -1,0 +1,79 @@
+<div>
+      <a class="hiddenanchor" id="signup"></a>
+      <a class="hiddenanchor" id="signin"></a>
+      
+      <div class="login_wrapper">
+        <div style="background-color:white; padding: 10%;" class="animate form login_form">
+          <section class="login_content">
+            <!-- Imprimir as mensagens que estão na sessão -->
+            {{>_msg}}
+            <form method="post" action="/login">
+              <h1>Login</h1>
+              <div class="col-md-12 col-sm-12  form-group has-feedback botton_estilizado">
+                <input type="text" name="loginsei" class="form-control has-feedback-left input_login" placeholder="Login Sei" required="" />
+                <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
+              </div>
+              <div class="col-md-12 col-sm-12  form-group has-feedback botton_estilizado">
+                <input type="password" name="password" class="form-control has-feedback-left input_login" placeholder="Senha" required="" />
+                <span class="fa fa-lock form-control-feedback left" aria-hidden="true"></span>
+              </div>
+              <div class="col-md-12 col-sm-12  form-group has-feedback">
+                <button type="submit"  value="Acessar" class="form-control has-feedback-center input_login btn-dark">ENTRAR</button>
+              </div>
+              <div class="clearfix"></div>
+
+              <div class="separator">
+                <p class="change_link">
+                  <a href="#signup" class="to_register"> Solicitar Autorização para Entrar </a>
+                </p>
+
+                <div class="clearfix"></div>
+                <br />
+
+                <div>
+                  <h1><img href="index.php" class="img-circle img-responsive" src="/images/logo/dpo_logo.png" width="40px" height="40px" class="img-circle profile_img"> Genesis</h1>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <div style="background-color:white; padding: 10%;" id="register" class="animate form registration_form">
+          <section class="login_content">
+            <form>
+              <h1>Solicitar</h1>
+              <div class="col-md-12 col-sm-12  form-group has-feedback botton_estilizado">
+                <input type="number" name="matricula" class="form-control has-feedback-left input_login" placeholder="Matricula" required="" />
+                <span class="fa fa-check form-control-feedback left" aria-hidden="true"></span>
+              </div>
+              <div class="col-md-12 col-sm-12  form-group has-feedback botton_estilizado">
+                <input type="text" name="loginsei" class="form-control has-feedback-left input_login" placeholder="Login SEI" required="" />
+                <span class="fa fa-building form-control-feedback left" aria-hidden="true"></span>
+              </div>
+              <div class="col-md-12 col-sm-12  form-group has-feedback botton_estilizado">
+                <input type="text" name="phone" class="form-control has-feedback-left input_login" placeholder="(00)0000-0000" required="" />
+                <span class="fa fa-phone form-control-feedback left" aria-hidden="true"></span>
+              </div>
+              <div class="col-md-12 col-sm-12  form-group has-feedback">
+                <button onclick="javascript:alert('Modulo Não Autorizado')" class="form-control has-feedback-center input_login btn-success">Enviar Solicitação</button>
+              </div>
+
+              <div class="clearfix"></div>
+
+              <div class="separator">
+                <p class="change_link">Já está cadastrado?
+                  <a href="#signin" class="to_register"> Entre </a>
+                </p>
+
+                <div class="clearfix"></div>
+                <br />
+
+                <div>
+                  <h1><img href="index.php" class="img-circle img-responsive" src="/images/logo/dpo_logo.png" width="40px" height="40px" class="img-circle profile_img"> Genesis</h1>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>

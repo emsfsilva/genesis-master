@@ -1,0 +1,135 @@
+<!-- page content -->
+<div class="right_col" role="main">
+  <div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Usuario</h2>
+            <ul class="nav navbar-right panel_toolbox">
+              
+              <li><a href="/unidade/unidadeprofile/edit"><i class="fa fa-edit text-warning"></i></a></li>
+              <li><a href="/unidade/unidadeprofile/edit-password"><i class="fa fa-key text-success"></i></a></li>
+              <li><a href="/unidade/unidadeprofile/edit-image"><i class="fa fa-image text-primary"></i></a></li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+              {{>_msgAdm}}
+              <div class="col-md-2 col-sm-2  profile_left">
+                <div class="profile_img">
+                  <div id="crop-avatar">
+                    {{#if user.dataValues.image}}
+                    <img class="img-responsive avatar-view" src="/images/users/{{user.dataValues.image}}" width="150px"
+                      height="150px" alt="Avatar" title="Change the avatar">
+                    {{else}}
+                    <img class="img-responsive avatar-view" src="/images/users/user.jpg" width="150px" height="150px"
+                      alt="Avatar" title="Change the avatar">
+                    {{/if}}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-10 col-sm-10 ">
+                <!-- start recent activity -->
+                      <div class="col-md-12 ">
+                        <div class="x_panel">
+                          <div class="x_title">
+                            <h2><small>Informações Basicas</small></h2>
+
+                            <div class="clearfix"></div>
+                          </div>
+                          <div class="x_content">
+                            <br />
+                            <form class="form-horizontal form-label-left">
+                              <div class="form-group row ">
+                                <label class="control-label col-md-3 col-sm-3 ">Nome</label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a>{{user.dataValues.name}}</a>
+                                  </label>
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 ">Email </label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a>{{user.dataValues.email}}</a>
+                                  </label>
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 "> Situação</label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a href="/situations/view/{{user.dataValues.situationId}}">
+                                      {{user.situation.dataValues.nameSituation}}
+                                    </a>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 "> OME</label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a href="/situations/view/{{user.dataValues.omeId}}">
+                                      {{user.ome.dataValues.nome}}
+                                    </a>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 ">Login SEI </label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a>{{user.dataValues.loginsei}}</a>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 ">Telefone </label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a>{{user.dataValues.telefone}}</a>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 "> Credencial</label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a>{{user.PcontasOme.dataValues.nome}}</a>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div class="form-group row">
+                                <label class="control-label col-md-3 col-sm-3 ">Data do Cadastro </label>
+                                <div class="col-md-9 col-sm-9 ">
+                                  <label class="control-label">
+                                    <a>{{#formatDateTime user.dataValues.createdAt}}{{/formatDateTime}}</a>
+                                  </label>
+                                </div>
+                              </div>
+
+                              <div class="ln_solid"></div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- end recent activity -->
+                
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /page content -->

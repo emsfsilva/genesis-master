@@ -1,0 +1,204 @@
+<style>
+    th,
+    td {
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
+
+    .td_laranja {
+        color: orange;
+    }
+
+    .td_verde {
+        color: green;
+    }
+
+    .td_vermelho {
+        color: red;
+    }
+
+    .contas {
+        color: orange;
+    }
+
+    .td_unidades {
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .td_unidades_right {
+        border-bottom: 1px solid #ddd;
+        text-align: right;
+    }
+
+    .th_dist {
+        background-color: #015050;
+        color: white;
+        text-align: center;
+    }
+
+    .th_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    .btn_event {
+        background-color: #191970;
+        color: white;
+        text-align: center;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2
+    }
+</style>
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 ">
+                <div class="x_panel">
+
+                    <div class="x_title">
+                        <h2>Eventos <small>PJES</small></h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                            <li><a href="/pjes?page=1"><i class="fa fa-bars text-primary"></i></a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        {{>_msgAdm}}
+                        <div class="col-md-1 col-sm-1  profile_left">
+                            <div class="profile_img">
+                                <div id="crop-avatar">
+                                    <img class="img-responsive avatar-view" src="/images/util/pjes_icone.png"
+                                        width="90px" height="90px" alt="Avatar" title="Change the avatar">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-11 col-sm-11 ">
+                            <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                <!-- start recent activity -->
+                                <div class="col-md-12 ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2>Prestação de Contas</h2>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+
+
+                                            <!-- INICIO DETALHES DO EVENTO PJES -->
+                                                    <div class="col-md-4 col-sm-4 x_panel" style="height:750px;">
+                                                        <section class="panel">
+                                                            <div class="panel-body">
+                                                                {{#each total_prestarconta}}
+                                                                <h3 class="green"><i class="fa fa-paint-brush"></i>
+                                                                    {{'ome.nome'}}
+                                                                </h3>
+                                                                {{/each}}
+
+                                                                <div class="project_detail">
+                                                                    <p class="title"><i class=""></i> EVENTOS DO MÊS</p>
+                                                                    {{#each nomesEventosporome}}
+                                                                        <p class="title">  <i class="fa fa-check"></i> {{dataValues.evento}} </br> --- OF: {{dataValues.cotaofdist}} | PRÇ: {{dataValues.cotaprcdist}}</p> </br>
+                                                                    {{/each}}
+                                                                </div>
+                                                                <br />
+                                                                <h5>Total Disponibilizado</h5>
+
+                                                                {{#each total_prestarconta}}
+                                                            
+                                                                <ul class="list-unstyled project_files">        
+                                                                    <li><a><i class="fa fa-university"></i>
+                                                                            {{operacao}}</a>
+                                                                    </li>
+                                                                    <li><a class="fa fa-star"> Oficiais: {{total_cotaofdist}} | <i class="valor">{{total_cotaofdist_multiplicado}}</i></a></li>
+                                                                    <li><a class="fa fa-angle-double-up"> Praças: {{total_cotaprcdist}} | <i class="valor">{{total_cotaprcdist_multiplicado}}</i></a>
+                                                                    
+                                                                    <li><a><i class="fa fa-calendar"></i>
+                                                                            Mês: {{mes}}</a>
+                                                                    </li>
+                                                                    <li><a><i class="fa fa-tag"></i>
+                                                                            Ano: {{ano}}</a>
+                                                                    </li>
+                                                                    <li><a><i class="fa fa-file-pdf-o"></i>
+                                                                            SEI / CV: {{sei}}</a>
+                                                                    </li>
+                                                                </ul>
+
+                                                                {{/each}}
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                
+                                                <!-- FIM DETALHES DO EVENTO PJES -->
+
+                                                <div class="col-md-8 col-sm-8x_panel" style="height:750px;">
+                                                    <br />
+
+                                                    <div class="x_title">
+                                                        <h2>Total de Cotas Utilizadas</h2>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <form class="form-label-left input_mask" action="/pjes/pjesgercota" method="post">
+                                                        <input type="hidden" name="id" id="id" value="{{data.id}}">
+                                                        <input type="hidden" name="iduser" id="iduser" value="{{profile.id}}">
+
+                                                        <div class="col-md-6 col-sm-6  form-group has-feedback">
+                                                            <input name="ttofexe" id="ttofexe" type="number"
+                                                                class="form-control has-feedback-left" placeholder="Oficiais"
+                                                                value="{{data.ttofexe}}">
+                                                            <span class="fa fa-star form-control-feedback left"
+                                                                aria-hidden="true"></span>
+                                                        </div>
+
+                                                        <div class="col-md-6 col-sm-6  form-group has-feedback">
+                                                            <input name="ttprcexe" id="ttprcexe" type="number"
+                                                                class="form-control has-feedback-left" placeholder="Praças"
+                                                                value="{{data.ttprcexe}}">
+                                                            <span class="fa fa-angle-double-up form-control-feedback left"
+                                                                aria-hidden="true"></span>
+                                                        </div>
+
+                                                        <label class="col-form-label col-md-3 col-sm-3 ">Anotações<span
+                                                            class="required"></span></label>
+                                                        <div class="col-md-12 col-sm-12  form-group has-feedback">
+<textarea style="height: 150px;" class="resizable_textarea form-control" placeholder="This text">
+{{data.obs}}
+</textarea>
+                                                        </div>
+                                                            <button type="submit" class="btn btn-success">Salvar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end recent activity -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+<!-- /FORMATAR A CELULA NO FORMATO DE MOEDA BRASILEIRA -->
+<script>
+    var elementos = document.querySelectorAll('.valor');
+    elementos.forEach(function(elemento) {
+    var valor = parseFloat(elemento.textContent);
+    elemento.textContent = valor.toLocaleString('pt-BR', {style: 'currency',currency: 'BRL'});
+    });
+</script>

@@ -1,0 +1,180 @@
+<style>
+  .center {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+</style>
+
+<!-- page content -->
+
+<div class="right_col" role="main">
+  <div class="">
+    <div class="clearfix"></div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+
+          <div class="x_title">
+            <h2>Consulta Escalas</h2>
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="x_content"> 
+            {{>_msgAdm}}
+            
+            
+              <div class="col-md-12 ">
+                
+                  <div class="col-md-12 col-sm-12  profile_left">
+
+                    <div class="center profile_img col-md-3 col-sm-3">
+                      <div id="crop-avatar">
+                        {{#if user.dataValues.image}}
+                        <img class="img-responsive avatar-view" src="/images/users/usuariopadrao.png" width="90px"
+                          height="150px" alt="Avatar" title="Change the avatar">
+                        {{else}}
+                        <img class="img-responsive avatar-view" src="/images/users/usuariopadrao.png" width="90px" height="90px"
+                          alt="Avatar" title="Change the avatar">
+                        {{/if}}
+                      </div>
+                    </div>
+               
+                    <div class="col-md-9 col-sm-9">
+                      <div>
+                          <br />
+                          <ul class="list-unstyled project_files">
+                            <li><a><i class="fa fa-user"></i>
+                                     NOME: {{pmEscalado.dataValues.nome}}</a>
+
+                              <li><a><i class="fa fa-barcode"></i>
+                                     MATRICULA: {{pmEscalado.dataValues.matricula}}</a>
+                              </li>
+                              <li><a><i class="fa fa-tag"></i>
+                                     P/G:{{pmEscalado.dataValues.pg}}</a>
+                              </li>
+                              <li><a><i class="fa fa-university"></i>
+                                     OME: {{pmEscalado.dataValues.ome_sgpm}}</a>
+                              </li>
+                          </ul>
+
+                      </div>
+                    </div>
+
+                  </div>
+
+
+
+                  <div class="x_content">
+                    {{#if escalasAgrupadasPorMes}}
+                      {{#each escalasAgrupadasPorMes}}
+                        <div class="accordion" id="accordion-{{@index}}" role="tablist" aria-multiselectable="true">
+                          <div class="panel">
+                            <a class="panel-heading" role="tab" id="heading-{{@index}}" data-toggle="collapse" data-parent="#accordion-{{@index}}" href="#collapse-{{@index}}" aria-expanded="true" aria-controls="collapse-{{@index}}">
+                              <h4 class="panel-title">
+                                {{this.mes}} <!-- Exibe o mês e ano, por exemplo, 'JANEIRO 2024' -->
+                              </h4>
+                            </a>
+                            <div id="collapse-{{@index}}" class="panel-collapse collapse in table-responsive" role="tabpanel" aria-labelledby="heading-{{@index}}">
+                                {{#each this.eventos}}
+                                  <div class="accordion" id="event-accordion-{{@index}}" role="tablist" aria-multiselectable="true">
+                                    
+                                      <a class="panel-heading" role="tab" id="event-heading-{{@index}}" data-toggle="collapse" data-parent="#event-accordion-{{@index}}" href="#event-collapse-{{@index}}" aria-expanded="true" aria-controls="event-collapse-{{@index}}">
+                                        <p class="" style="margin-left: 15px; text-size: 10px">
+                                          <i class="fa fa-check"></i> {{this.evento}} <!-- Exibe o evento -->
+                                        </p>
+                                      </a>
+                                      <div id="event-collapse-{{@index}}" class="panel-collapse collapse table-responsive" role="tabpanel" aria-labelledby="event-heading-{{@index}}">
+                                        
+                                          <!-- start project list -->
+                                          <table class="table table-striped projects">
+                                            <thead>
+                                              <tr>
+                                                <th style="width: 10%">Data</th>
+                                                <th style="width: 50%">Equipe de Serviço</th>
+                                                <th style="width: 40%">Anotações</th>
+                                                <th style="width: 40%">Unidade</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {{#each this.ideventos}}
+                                                <tr>
+                                                  <td>{{this.data_inicio}}<br>{{this.hora_inicio}} às {{this.hora_fim}} {{this.anotacoes}}</td>
+                                                    <td>
+                                                      <ul class="list-unstyled project_files">
+                                                        {{#each this.escalas}}
+                                                          <li><a><img src="/images/users/usuariopadrao.png" class="avatar" alt="Avatar">
+                                                          {{this.pg}} {{this.matricula}} {{this.nome}} {{this.ome_sgpm}} {{this.telefone}} {{this.modalidade}}</a></a></li>
+                                                        {{/each}}
+                                                      </ul>
+                                                    </td>
+                                                    
+                                                    <td>
+                                                      <ul class="list-inline">
+                                                        {{#each this.escalas}}
+                                                          <li>
+                                                            {{this.anotacoes}}<br>
+                                                          </li>
+                                                        {{/each}}
+                                                      </ul>
+                                                    </td>
+
+                                                    <td>
+                                                      <ul class="list-inline">
+                                                        {{#each this.escalas}}
+                                                          <li>
+                                                            {{this.ome}}<br>
+                                                          </li>
+                                                        {{/each}}
+                                                      </ul>
+                                                    </td>
+                                                    
+                                                </tr>
+                                              {{/each}}
+                                            </tbody>
+                                          </table>
+                                          <!-- end project list -->
+                                        
+                                      </div>
+                                    
+                                  </div>
+                                {{/each}}
+                            </div>
+                          </div>
+                        </div>
+                      {{/each}}
+                    {{else}}
+                      <div>
+                        <h2>Nenhuma Escala Encontrada</h2>
+                        <p>Não foram encontradas escalas para a matrícula informada.</p>
+                      </div>
+                    {{/if}}
+                  </div>
+
+                  <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                      // Adiciona event listeners para expandir/ocultar eventos
+                      document.querySelectorAll('.panel-heading').forEach(panelHeading => {
+                        panelHeading.addEventListener('click', () => {
+                          const target = document.querySelector(panelHeading.getAttribute('data-target'));
+                          if (target) {
+                            $(target).collapse('toggle');
+                          }
+                        });
+                      });
+                    });
+                  </script>
+
+                
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /page content -->

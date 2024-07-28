@@ -1,0 +1,69 @@
+<!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 ">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2>Usuario</h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li><a href="/unidade/unidadeprofile"><i class="fa fa-reply text-primary"></i> Voltar</a></li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                {{>_msgAdm}}
+                                <div class="col-md-2 col-sm-2  profile_left">
+                                    <div class="profile_img">
+                                        <div id="crop-avatar">
+                                        <!-- Current avatar -->
+                                        {{#if data.image}}
+                                                <img class="img-responsive avatar-view" src="/images/users/{{data.image}}" width="150px" height="150px" alt="Avatar" title="Change the avatar">
+                                            {{else}}
+                                                <img class="img-responsive avatar-view" src="/images/users/user.jpg" width="150px" height="150px" alt="Avatar" title="Change the avatar">
+                                            {{/if}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-10 col-sm-10 ">
+                                    <!-- start recent activity -->
+                                    <div class="col-md-12 ">
+                                    <div class="x_panel">
+                                        <div class="x_title">
+                                            <h2><small>Editar Telefone</small></h2>
+                                            
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="x_content">
+                                            <br />
+                                            <form class="form-horizontal form-label-left" action="/unidade/unidadeprofile/edit" method="post">
+                                                
+                                                <input type="hidden" name="id" id="id" value="{{data.id}}">
+
+                                                <div class="form-group row ">
+                                                    <label class="control-label col-md-3 col-sm-3 ">Telefone</label>
+                                                    <div class="col-md-9 col-sm-9 ">
+                                                        <input name="telefone" id="telefone" type="phone" class="form-control" value="{{data.telefone}}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="ln_solid"></div>
+                                                <div class="form-group">
+                                                    <div class="col-md-9 col-sm-9  offset-md-3">
+                                                        <input type="submit" value="Editar" class="btn btn-success"/>
+                                                    </div>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <!-- end recent activity -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
