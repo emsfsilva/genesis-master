@@ -54,6 +54,9 @@ module.exports = {
       localap: {
         type: Sequelize.STRING
       },
+      ttcota: {
+        type: Sequelize.INTEGER
+      },
       anotacoes: {
         type: Sequelize.STRING
       },

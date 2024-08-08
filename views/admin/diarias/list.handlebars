@@ -56,6 +56,18 @@
     tr:nth-child(even) {
         background-color: #f2f2f2
     }
+
+
+    /* Garantir que a altura das células se ajuste ao conteúdo */
+td.auto-height {
+    vertical-align: top; /* Alinha o texto ao topo da célula, ajustando a altura conforme necessário */
+    padding: 0px; /* Adiciona algum preenchimento para melhor apresentação */
+}
+
+/* Caso você queira garantir que a altura do texto se ajuste */
+tr {
+    height: auto; /* Ajusta a altura das linhas automaticamente */
+}
 </style>
 
 <script>
@@ -164,7 +176,7 @@
                                             <div class="row">
 
                                                 <!-- /INICIO DIRETORIAS -->
-                                                <div class="col-sm-4 mail_list_column " style="font-size: 11px;">
+                                                <div class="col-sm-4 mail_list_column " style="font-size: 9px;">
                                                     <button id="compose"
                                                         style="background-color:#015050; border-color:white; color:white"
                                                         class="btn btn-sm btn-block" type="button">DIRETORIAS</button>
@@ -176,7 +188,7 @@
                                                             <div class="mail_list" style="width:100%; display: flex;">
                                                                 <!-- /INICIO DISTRIBUIÇÃO DPO -->
                                                                     <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
@@ -197,11 +209,11 @@
                                                                             <tbody>
                                                                             {{#each total_cotadistdpo}}
                                                                                 <tr>
-                                                                                    <td class="">{{'ome.nome'}}</td>
-                                                                                    <td class="">{{total_cotadist_original}}</td>
-                                                                                    <td class="">{{total_cotadist_reforco}}</td>
-                                                                                    <td class="">{{total_cotadist}}</td>
-                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                    <td>{{'ome.nome'}}</td>
+                                                                                    <td>{{total_cotadist_original}}</td>
+                                                                                    <td>{{total_cotadist_reforco}}</td>
+                                                                                    <td>{{total_cotadist}}</td>
+                                                                                    <td><i class="valor">{{total_cotadist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -212,7 +224,7 @@
 
                                                                 <!-- /INICIO EXECUÇÃO DPO -->        
                                                                     <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
@@ -234,7 +246,7 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaexe_multiplicado}} </i></td>
                                                                                         <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
                                                                                     </tr>
                                                                                 {{/each}}
@@ -272,7 +284,7 @@
                                                             <div class="mail_list" style="width:100%; display: flex;">
                                                                 <!-- /INICIO DISTRIBUIÇÃO DIM -->
                                                                     <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
@@ -297,7 +309,7 @@
                                                                                     <td class="">{{total_cotadist_original}}</td>
                                                                                     <td class="">{{total_cotadist_reforco}}</td>
                                                                                     <td class="">{{total_cotadist}}</td>
-                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                    <td class=""><i class="valor">{{total_cotadist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -308,7 +320,7 @@
 
                                                                 <!-- /INICIO EXECUÇÃO DIM -->        
                                                                     <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
@@ -330,7 +342,7 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaexe_multiplicado}} </i></td>
                                                                                         <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
                                                                                     </tr>
                                                                                 {{/each}}
@@ -369,7 +381,7 @@
                                                             <div class="mail_list" style="width:100%; display: flex;">
                                                                 <!-- /INICIO DISTRIBUIÇÃO DIRESP -->
                                                                     <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px"> 
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
@@ -394,7 +406,7 @@
                                                                                     <td class="">{{total_cotadist_original}}</td>
                                                                                     <td class="">{{total_cotadist_reforco}}</td>
                                                                                     <td class="">{{total_cotadist}}</td>
-                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                    <td class=""><i class="valor">{{total_cotadist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -405,7 +417,7 @@
 
                                                                 <!-- /INICIO EXECUÇÃO DIRESP -->        
                                                                     <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px"> 
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
@@ -427,7 +439,7 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaexe_multiplicado}} </i></td>
                                                                                         <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
                                                                                     </tr>
                                                                                 {{/each}}
@@ -466,7 +478,7 @@
                                                             <div class="mail_list" style="width:100%; display: flex;">
                                                                 <!-- /INICIO DISTRIBUIÇÃO DINTERI -->
                                                                     <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px"> 
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
@@ -491,7 +503,7 @@
                                                                                     <td class="">{{total_cotadist_original}}</td>
                                                                                     <td class="">{{total_cotadist_reforco}}</td>
                                                                                     <td class="">{{total_cotadist}}</td>
-                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                    <td class=""><i class="valor">{{total_cotadist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -502,7 +514,7 @@
 
                                                                 <!-- /INICIO EXECUÇÃO DINTERI -->        
                                                                     <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px"> 
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
@@ -524,7 +536,7 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaexe_multiplicado}} </i></td>
                                                                                         <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
                                                                                     </tr>
                                                                                 {{/each}}
@@ -562,7 +574,7 @@
                                                             <div class="mail_list" style="width:100%; display: flex;">
                                                                 <!-- /INICIO DISTRIBUIÇÃO DINTERII -->
                                                                     <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px"> 
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Distrib:</th>
@@ -587,7 +599,7 @@
                                                                                     <td class="">{{total_cotadist_original}}</td>
                                                                                     <td class="">{{total_cotadist_reforco}}</td>
                                                                                     <td class="">{{total_cotadist}}</td>
-                                                                                    <td class=""><span class="count_bottom"><i class="valor">{{total_cotadist_multiplicado}}</i></span></td>
+                                                                                    <td class=""><i class="valor">{{total_cotadist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -598,7 +610,7 @@
 
                                                                 <!-- /INICIO EXECUÇÃO DINTERII -->        
                                                                     <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px"> 
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i class="fa fa-level-up"></i> Execut:</th>
@@ -620,7 +632,7 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaexe_multiplicado}} </i></span> </td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaexe_multiplicado}} </i></td>
                                                                                         <td> | <a href="/diarias/diariasgercota/{{id}}" title="Prestar Conta"> <i class="fa fa-key"></i> </a></td>
                                                                                     </tr>
                                                                                 {{/each}}
@@ -663,7 +675,7 @@
                                                         <div class="view-mail card-box table-responsive">
                                                             
                                                             <a href="/diarias/add" type="button" class="btn btn-sm btn_event btn-block" type="button">ADICIONAR EVENTOS</a>
-                                                            <table id="datatable" style="width:100%; font-size: 11px">
+                                                            <table id="datatable" style="width:100%; font-size: 9px"> 
                                                                 {{>_msgAdm}}
                                                                 <thead>
                                                                     <tr class="th_event">

@@ -159,19 +159,20 @@
                                             <div class="row">
 
                                                 <!-- /INICIO DIRETORIAS -->
-                                                <div class="col-sm-5 mail_list_column " style="font-size: 11px;">
+                                                <div class="col-sm-5 mail_list_column " style="font-size: 9px;">
                                                     <button id="compose"
                                                         style="background-color:#015050; border-color:white; color:white"
                                                         class="btn btn-sm btn-block" type="button">{{profile.ome.dataValues.nome}}</button>
 
+                                                   
                                                     <!-- INICIO UNIDADE -->
                                                     <div>
                                                         <div class="mail_list">
-                                                            <h3>OME </h3>
+                                                            <h3>OME</h3>
                                                             <div class="mail_list" style="width:100%; display: flex;">
-                                                                <!-- /INICIO DISTRIBUIÇÃO UNIDADE -->
+                                                                <!-- /INICIO DISTRIBUIÇÃO OME -->
                                                                     <div class="col-md-6" style="overflow-x:auto; padding-right: 5px; padding-left: 0px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table  style="width:100%; font-size: 9px">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th colspan="2"><i
@@ -199,23 +200,22 @@
                                                                             <tbody>
                                                                             {{#each total_cotadistunidade}}
                                                                                 <tr>
-                                                                                <td class="">{{'ome.nome'}}</td>
-                                                                                <td class="">{{total_cotaofdist}}</td>
-                                                                                <td class=""><span class="count_bottom"><i class="valor">{{total_cotaofdist_multiplicado}}</i></span></td>
-
+                                                                                <td>{{'ome.nome'}}</td>
+                                                                                <td class="td_unidades_right">{{total_cotaofdist}}</td>
+                                                                                <td class="td_unidades_right"><i class="valor">{{total_cotaofdist_multiplicado}}</i></td>
                                                                                 <td class="td_unidades_right">{{total_cotaprcdist}}</td>
-                                                                                <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></span></td>
+                                                                                <td class="td_unidades_right"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
                                                                         </table>
 
                                                                     </div>
-                                                                <!-- /FIM DISTRIBUIÇÃO UNIDADE -->
+                                                                <!-- /FIM DISTRIBUIÇÃO OME -->
 
-                                                                <!-- /INICIO EXECUÇÃO UNIDADE -->        
+                                                                <!-- /INICIO EXECUÇÃO OME -->        
                                                                     <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
-                                                                        <table style="width:100%; font-size: 11px">
+                                                                        <table style="width:100%; font-size: 9px">
                                                                             <thead>
                                                                                 <tr>
                                                                                     
@@ -247,10 +247,10 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaofexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaofexe_multiplicado}} </i></span></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaofexe_multiplicado}} </i></td>
 
                                                                                         <td class="">{{total_cotaprcexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></span></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></td>
                                                                                         
                                                                                     </tr>
                                                                                 {{/each}}
@@ -258,10 +258,10 @@
                                                                         </table>
                                                                     </div>
                                                                     
-                                                                <!-- /FIM EXECUÇÃO UNIDADE -->
+                                                                <!-- /FIM EXECUÇÃO OME -->
                                                             </div>
 
-                                                            <!-- /INICIO SALDO UNIDADE -->
+                                                            <!-- /INICIO SALDO OME -->
                                                             <h3 style="margin-bottom: 2px; margin-right: 2px;">
                                                                 Planejado:<small><span class="count_bottom"><i
                                                                             class="valor">{{valorFinalDistUnidade}} </i></span></small></h3>
@@ -276,10 +276,10 @@
                                                                                 class="fa fa-sort-asc"></i></i></span></small>
                                                             </h3>
                                                             </br></br>
-                                                            <!-- /FIM SALDO UNIDADE -->
+                                                            <!-- /FIM SALDO OME -->
                                                         </div>
                                                     </div>
-                                                    <!-- FIM UNIDADE -->
+                                                    <!-- FIM DPO -->   
 
                                                     
 
@@ -332,10 +332,10 @@
                                                                                 <tr>
                                                                                 <td class="">{{'ome.nome'}}</td>
                                                                                 <td class="">{{total_cotaofdist}}</td>
-                                                                                <td class=""><span class="count_bottom"><i class="valor">{{total_cotaofdist_multiplicado}}</i></span></td>
+                                                                                <td class=""><i class="valor">{{total_cotaofdist_multiplicado}}</i></td>
 
                                                                                 <td class="td_unidades_right">{{total_cotaprcdist}}</td>
-                                                                                <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></span></td>
+                                                                                <td class="td_unidades_right"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -378,11 +378,11 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaofexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaofexe_multiplicado}} </i></span></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaofexe_multiplicado}} </i></td>
 
                                                                                         <td class="">{{total_cotaprcexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></span></td>
-                                                                                        <td> | <a href="/pjes/pjesgercota/{{id}}" title="Editar Registro"> <i class="fa fa-key"></i> </a></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></td>
+                                                                                        
                                                                                     </tr>
                                                                                 {{/each}}
                                                                             </tbody>
@@ -449,10 +449,10 @@
                                                                                 <tr>
                                                                                 <td class="">{{'ome.nome'}}</td>
                                                                                 <td class="">{{total_cotaofdist}}</td>
-                                                                                <td class=""><span class="count_bottom"><i class="valor">{{total_cotaofdist_multiplicado}}</i></span></td>
+                                                                                <td class=""><i class="valor">{{total_cotaofdist_multiplicado}}</i></td>
 
                                                                                 <td class="td_unidades_right">{{total_cotaprcdist}}</td>
-                                                                                <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></span></td>
+                                                                                <td class="td_unidades_right"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -495,11 +495,11 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaofexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaofexe_multiplicado}} </i></span></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaofexe_multiplicado}} </i></td>
 
                                                                                         <td class="">{{total_cotaprcexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></span></td>
-                                                                                        <td> | <a href="/pjes/pjesgercota/{{id}}" title="Editar Registro"> <i class="fa fa-key"></i> </a></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></td>
+                                                                                        
                                                                                     </tr>
                                                                                 {{/each}}
                                                                             </tbody>
@@ -566,10 +566,10 @@
                                                                                 <tr>
                                                                                 <td class="">{{'ome.nome'}}</td>
                                                                                 <td class="">{{total_cotaofdist}}</td>
-                                                                                <td class=""><span class="count_bottom"><i class="valor">{{total_cotaofdist_multiplicado}}</i></span></td>
+                                                                                <td class=""><i class="valor">{{total_cotaofdist_multiplicado}}</i></td>
 
                                                                                 <td class="td_unidades_right">{{total_cotaprcdist}}</td>
-                                                                                <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></span></td>
+                                                                                <td class="td_unidades_right"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -612,11 +612,11 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaofexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaofexe_multiplicado}} </i></span></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaofexe_multiplicado}} </i></td>
 
                                                                                         <td class="">{{total_cotaprcexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></span></td>
-                                                                                        <td> | <a href="/pjes/pjesgercota/{{id}}" title="Editar Registro"> <i class="fa fa-key"></i> </a></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></td>
+                                                                                        
                                                                                     </tr>
                                                                                 {{/each}}
                                                                             </tbody>
@@ -683,10 +683,10 @@
                                                                                 <tr>
                                                                                 <td class="">{{'ome.nome'}}</td>
                                                                                 <td class="">{{total_cotaofdist}}</td>
-                                                                                <td class=""><span class="count_bottom"><i class="valor">{{total_cotaofdist_multiplicado}}</i></span></td>
+                                                                                <td class=""><i class="valor">{{total_cotaofdist_multiplicado}}</i></td>
 
                                                                                 <td class="td_unidades_right">{{total_cotaprcdist}}</td>
-                                                                                <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></span></td>
+                                                                                <td class="td_unidades_right"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -729,11 +729,11 @@
                                                                                     <tr>
                                                                                         <td class="">{{'ome.nome'}}</td>
                                                                                         <td class="">{{total_cotaofexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaofexe_multiplicado}} </i></span></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaofexe_multiplicado}} </i></td>
 
                                                                                         <td class="">{{total_cotaprcexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></span></td>
-                                                                                        <td> | <a href="/pjes/pjesgercota/{{id}}" title="Editar Registro"> <i class="fa fa-key"></i> </a></td>
+                                                                                        <td class="td_unidades_right"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></td>
+                                                                                        
                                                                                     </tr>
                                                                                 {{/each}}
                                                                             </tbody>
@@ -800,10 +800,10 @@
                                                                                 <tr>
                                                                                 <td class="">{{'ome.nome'}}</td>
                                                                                 <td class="">{{total_cotaofdist}}</td>
-                                                                                <td class=""><span class="count_bottom"><i class="valor">{{total_cotaofdist_multiplicado}}</i></span></td>
+                                                                                <td class=""><i class="valor">{{total_cotaofdist_multiplicado}}</i></td>
 
                                                                                 <td class="td_unidades_right">{{total_cotaprcdist}}</td>
-                                                                                <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></span></td>
+                                                                                <td class="td_unidades_right"><i class="valor">{{total_cotaprcdist_multiplicado}}</i></td>
                                                                                 </tr>
                                                                             {{/each}}
                                                                             </tbody>
@@ -813,51 +813,49 @@
                                                                 <!-- /FIM DISTRIBUIÇÃO ENEM -->
 
                                                                 <!-- /INICIO EXECUÇÃO ENEM -->        
-                                                                    <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
-                                                                        <table style="width:100%">
-                                                                            <thead>
+                                                                <div class="col-md-6" style=" overflow-x:auto; padding-right: 0px; padding-left: 1px; solid #ddd; width:100%">
+                                                                    <table style="width:100%">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th colspan="2"><i
+                                                                                        class="fa fa-level-down"></i>
+                                                                                    Executado</th>
+                                                                                <th colspan="4">[ <i
+                                                                                        class="fa fa-star"></i>: {{totalcotaOfExeEnem}} |
+                                                                                    <i
+                                                                                        class="fa fa-angle-double-up"></i>:
+                                                                                    {{totalcotaPrcExeEnem}}]</th>
+                                                                            </tr>
+                                                                            <tr class="th_dist">
+                                                                                <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
+                                                                                <th class="th_dist" colspan="2"><i class="fa fa-level-down"></i> OFICIAIS</th>
+                                                                                <th class="th_dist" colspan="3"><i class="fa fa-level-down"></i> PRAÇAS</th>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th class="th_dist">Und</th>
+                                                                                <th class="th_dist">Cota</th>
+                                                                                <th class="th_dist"><i></i> R$</th>
+                                                                                <th class="th_dist">Cota</th>
+                                                                                <th class="th_dist"><i></i> R$</th>
+                                                                                <th class="th_dist"><i></i></th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {{#each total_cotaexeenem}} 
                                                                                 <tr>
-                                                                                    
-                                                                                    <th colspan="2"><i
-                                                                                            class="fa fa-level-down"></i>
-                                                                                        Executado</th>
-                                                                                    <th colspan="4">[ <i
-                                                                                            class="fa fa-star"></i>: {{totalcotaOfExeEnem}} |
-                                                                                        <i
-                                                                                            class="fa fa-angle-double-up"></i>:
-                                                                                        {{totalcotaPrcExeEnem}}]</th>
-                                                                                </tr>
-                                                                                <tr class="th_dist">
-                                                                                    <th class="th_dist"  colspan="1"><i class="fa fa-university"></i></th>
-                                                                                    <th class="th_dist" colspan="2"><i class="fa fa-level-down"></i> OFICIAIS</th>
-                                                                                    <th class="th_dist" colspan="3"><i class="fa fa-level-down"></i> PRAÇAS</th>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th class="th_dist">Und</th>
-                                                                                    <th class="th_dist">Cota</th>
-                                                                                    <th class="th_dist"><i></i> R$</th>
-                                                                                    <th class="th_dist">Cota</th>
-                                                                                    <th class="th_dist"><i></i> R$</th>
-                                                                                    <th class="th_dist"><i></i></th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                {{#each total_cotaexeenem}} 
-                                                                                    <tr>
-                                                                                        <td class="">{{'ome.nome'}}</td>
-                                                                                        <td class="">{{total_cotaofexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaofexe_multiplicado}} </i></span></td>
+                                                                                    <td class="">{{'ome.nome'}}</td>
+                                                                                    <td class="">{{total_cotaofexe}}</td>
+                                                                                    <td class="td_unidades_right"><i class="valor">{{total_cotaofexe_multiplicado}} </i></td>
 
-                                                                                        <td class="">{{total_cotaprcexe}}</td>
-                                                                                        <td class="td_unidades_right"><span class="count_bottom"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></span></td>
-                                                                                        <td> | <a href="/pjes/pjesgercota/{{id}}" title="Editar Registro"> <i class="fa fa-key"></i> </a></td>
-                                                                                    </tr>
-                                                                                {{/each}}
-                                                                            </tbody>
-                                                                        </table>
-                                                                    </div>
-                                                                    
-                                                                <!-- /FIM EXECUÇÃO ENEM -->
+                                                                                    <td class="">{{total_cotaprcexe}}</td>
+                                                                                    <td class="td_unidades_right"><i class="valor">{{total_cotaprcexe_multiplicado}} </i></td>
+                                                                                </tr>
+                                                                            {{/each}}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                        
+                                                                    <!-- /FIM EXECUÇÃO ENEM -->
                                                             </div>
 
                                                             <!-- /INICIO SALDO ENEM -->
@@ -876,7 +874,7 @@
                                                             </h3>
                                                             </br></br>
                                                             <!-- /FIM SALDO ENEM -->
-                                                        </div>
+                                                            </div>
                                                     </div>
                                                     <!-- FIM ENEM -->
 
@@ -909,10 +907,10 @@
                                                                             <td>{{ome.nome}}</td>
                                                                             <td>{{operacao}}</td>
                                                                             <td>{{evento}}</td>
-                                                                            <td {{#gt cotaofdist count_pg_of}} style="background-color: rgb(184, 245, 181); color: rgb(32, 126, 45);"{{/gt}}>
+                                                                            <td {{#gt cotaofdist count_pg_of}} style="background-color: rgb(167, 221, 164); color: rgb(32, 126, 45);"{{/gt}}>
                                                                                 {{cotaofdist}} | {{count_pg_of}}
                                                                             </td>
-                                                                            <td {{#gt cotaprcdist count_pg_prc}} style="background-color: rgb(184, 245, 181); color: rgb(32, 126, 45);"{{/gt}}>
+                                                                            <td {{#gt cotaprcdist count_pg_prc}} style="background-color: rgb(167, 221, 164); color: rgb(32, 126, 45);"{{/gt}}>
                                                                                 {{cotaprcdist}} | {{count_pg_prc}}
                                                                             </td>
                                                                             

@@ -37,6 +37,7 @@ module.exports = (sequelize, DataTypes) => {
     hora_fim: DataTypes.STRING,
     ome_sgpm: DataTypes.STRING,
     localap: DataTypes.STRING,
+    ttcota: DataTypes.INTEGER,
     anotacoes: DataTypes.STRING,
     idevento: DataTypes.INTEGER,
     idome: DataTypes.INTEGER,

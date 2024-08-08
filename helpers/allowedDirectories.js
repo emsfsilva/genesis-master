@@ -236,6 +236,66 @@ const allowedDirectories = {
         60: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
         "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
         "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        61: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        62: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        63: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        64: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        65: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        66: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        67: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        68: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        69: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        70: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        71: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        72: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        73: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        74: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
+
+        75: ["/unidade/dashboard/","/unidade/unidadepjes/","/unidade/unidadepjes/view/", "/unidade/unidadepjes/escalas", "/unidade/unidadepjes/deleteEscala/",
+        "unidade/unidadepjes/gerar-arquivo-xls","/unidade/unidadeprofile","/unidade/unidadeprofile/edit","/unidade/unidadeconsultarEscalas",
+        "/unidade/unidadeusers","/unidade/unidadediarias/","/unidade/unidadediarias/view/",],
 };
 
 module.exports = allowedDirectories;

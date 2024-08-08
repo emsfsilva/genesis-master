@@ -17,26 +17,34 @@
                             enctype="multipart/form-data">
                             <input type="hidden" name="imageOld" id="imageOld" value="{{data.imageOld}}">
                             {{>_msgAdm}}
-                            <div class="col-md-2 col-sm-2  profile_left">
+                            <div class="col-md-3 col-sm-3  profile_left">
                                 <div class="profile_img">
                                     <div id="crop-avatar">
                                     <!-- Current avatar -->
-                                    {{#if data.imageOld}}
-                                    <span id="preview-img">
-                                        <img class="img-responsive avatar-view" src="/images/users/{{data.imageOld}}"
-                                            width="150px" height="150px" alt="Avatar" title="Change the avatar">
-                                    </span>
+                                    {{#if profile.image}}
+                                        <img class="img-responsive avatar-view" src="/images/users/{{profile.image}}" width="150px"
+                                    height="150px" alt="Avatar" title="Change the avatar">
                                     {{else}}
-                                    <span id="preview-img">
-                                    <img class="img-responsive avatar-view" src="/images/users/user.jpg" width="150px"
-                                        height="150px" alt="Avatar" title="Change the avatar">
-                                        </span>
+                                        <img class="img-responsive avatar-view" src="/images/users/user.jpg" width="150px" height="150px"
+                                        alt="Avatar" title="Change the avatar">
                                     {{/if}}
+                                    </div>
                                 </div>
-                                </div>
+                                <h3>{{profile.name}}</h3>
+                                <ul class="list-unstyled user_data">
+                                    <li><i class="fa fa-university user-profile-icon"></i> {{profile.ome.dataValues.nome}}
+                                        <ul><i class="fa fa-hand-o-right user-profile-icon"></i> {{profile.PcontasOme.dataValues.nome}}</ul>
+                                    </li>
+                                    <li><i class="fa fa-barcode user-profile-icon"></i> {{profile.matricula}}</li>
+                                    <li><i class="fa fa-user user-profile-icon"></i> {{profile.loginsei}}</li>
+                                    <li><i class="fa fa-phone user-profile-icon"></i> {{profile.telefone}}</li>
+                                    <li class="m-top-xs"><i class="fa fa-at user-profile-icon"></i><a>{{profile.email}}</a></li>
+                                </ul>
+                                    <a class="btn btn-success" style="color: #ffffff;"><i class="fa fa-user m-right-xs"></i> Situação: {{profile.situation.dataValues.nameSituation}}</a>
+                                <br />
                             </div>
 
-                            <div class="col-md-10 col-sm-10 ">
+                            <div class="col-md-9 col-sm-9 ">
                                 <div class="" role="tabpanel" data-example-id="togglable-tabs">
                                     <div id="myTabContent" class="tab-content">
                                         <div role="tabpanel" class="tab-pane active " id="tab_content1"

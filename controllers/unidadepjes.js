@@ -15,142 +15,3530 @@ const Excel = require('exceljs');
 
 
 router.get('/', eAdmin, async (req, res) => {
-    const nomeMes = req.session.mes;
-    const mes = req.session.mes;
-    const nomeAno = req.session.ano;
-    const ano = req.session.ano;
-    const { Op } = require('sequelize');
-    const { page = 1 } = req.query;
-    const limit = 40;
-    var lastPage = 1;
+            const nomeMes = req.session.mes;
+            const mes = req.session.mes;
+            const nomeAno = req.session.ano;
+            const ano = req.session.ano;
+            const { Op } = require('sequelize');
+            const { page = 1 } = req.query;
+            const limit = 40;
+            var lastPage = 1;
 
-    const countPjes = await db.pjes.count();
-    
-    if (countPjes === 0) {
-        return res.render("unidade/unidadepjes/list", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum pjes encontrada!' });
-    }
+    // INICIO DIM ------------------------------------------------------------------------------------------------------------------------------------------------
+    if (req.user.dataValues.omeId == 2){ 
+
+        const countPjes = await db.pjes.count();
+                
+                if (countPjes === 0) {
+                    return res.render("unidade/unidadepjes/list", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum pjes encontrada!' });
+                }
 
 
-//---UNIDADES | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
-    const Sequelize = require('sequelize');
-    const total_cotadistunidade = await db.pjes.findAll({
-        attributes: [
-            'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
-            [Sequelize.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
-            [Sequelize.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
-            [Sequelize.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
-            [Sequelize.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
-        ],
-        where: 
-            {
-                idome:req.user.dataValues.omeId,
-                ano,
-                mes,
-                operacao: {
-                    [Sequelize.Op.like]: 'PJES GOVERNO%'
+            //---UNIDADES | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelize = require('sequelize');
+                const total_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelize.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelize.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelize.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelize.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                            idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            ano,
+                            mes,
+                            operacao: {
+                                [Sequelize.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----UNIDADES | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecut = require('sequelize');
+                const total_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecut.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecut.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecut.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecut.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                        ano,
+                        mes,
+                        operacao: {
+                            [SequelizeExecut.Op.like]: 'PJES GOVERNO%'
+                            },
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+
+            //--- UNIDADES | INICIO CALCULAR OS VALORES TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS UNIDADES
+                const SequelizeDistUnidade = require('sequelize');
+                const valorfinal_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistUnidade.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistUnidade.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeDistUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                            
+                    },
+                    raw: true,
+                });
+
+                //VALOR DE COTAS EXECUTADAS OFICIAIS UNIDADES
+                const SequelizeExecutUnidade = require('sequelize');
+                const valorfinal_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutUnidade.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutUnidade.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeExecutUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    raw: true,
+                });
+
+            //---UNIDADES | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistUnidade = valorCotaOfDistUnidade + valorCotaPrcDistUnidade;
+
+                // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistUnidade = valorCotaOfDistUnidade/300;
+                const totalcotaPrcDistUnidade = valorCotaPrcDistUnidade/200;
+
+
+                // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeUnidade = valorCotaOfExeUnidade + valorCotaPrcExeUnidade;
+
+                // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeUnidade = valorCotaOfExeUnidade/300;
+                const totalcotaPrcExeUnidade = valorCotaPrcExeUnidade/200;
+
+                // CALCULO DO SALDO FINAL
+                const saldoFinalUnidade = valorFinalDistUnidade-valorFinalExeUnidade;
+
+            //---UNIDADES | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+
+            //---PE | INICIO
+
+        //---PE | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizepe = require('sequelize');
+                const total_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizepe.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizepe.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizepe.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizepe.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----PE | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutpe = require('sequelize');
+                const total_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutpe.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutpe.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- PE | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistPe = require('sequelize');
+                const valorfinal_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistPe.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistPe.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS PE
+                const SequelizeExecutPe = require('sequelize');
+                const valorfinal_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutPe.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutPe.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //---PE | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistPe = valorCotaOfDistPe + valorCotaPrcDistPe;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistPe = valorCotaOfDistPe/300;
+                const totalcotaPrcDistPe = valorCotaPrcDistPe/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExePe = valorCotaOfExePe + valorCotaPrcExePe;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExePe = valorCotaOfExePe/300;
+                const totalcotaPrcExePe = valorCotaPrcExePe/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalPe = valorFinalDistPe-valorFinalExePe;
+
+        //---PE | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---PE | FIM
+
+    //---TI | INICIO
+
+                //---TI | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeti = require('sequelize');
+                const total_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeti.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeti.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeti.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeti.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----TI | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutti = require('sequelize');
+                const total_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutti.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutti.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- TI | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistTi = require('sequelize');
+                const valorfinal_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistTi.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistTi.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS TI
+                const SequelizeExecutTi = require('sequelize');
+                const valorfinal_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutTi.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutTi.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //---TI | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistTi = valorCotaOfDistTi + valorCotaPrcDistTi;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistTi = valorCotaOfDistTi/300;
+                const totalcotaPrcDistTi = valorCotaPrcDistTi/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeTi = valorCotaOfExeTi + valorCotaPrcExeTi;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeTi = valorCotaOfExeTi/300;
+                const totalcotaPrcExeTi = valorCotaPrcExeTi/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalTi = valorFinalDistTi-valorFinalExeTi;
+
+            //---TI | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---TI | FIM
+
+    //---ENEM | INICIO
+
+                //---ENEM | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeenem = require('sequelize');
+                const total_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeenem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeenem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----ENEM | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutenem = require('sequelize');
+                const total_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutenem.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutenem.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- ENEM | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS ENEM
+                const SequelizeDistEnem = require('sequelize');
+                const valorfinal_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistEnem.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistEnem.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS ENEM
+                const SequelizeExecutEnem = require('sequelize');
+                const valorfinal_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutEnem.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutEnem.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //---ENEM | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistEnem = valorCotaOfDistTi + valorCotaPrcDistEnem;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistEnem = valorCotaOfDistEnem/300;
+                const totalcotaPrcDistEnem = valorCotaPrcDistEnem/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeEnem = valorCotaOfExeEnem + valorCotaPrcExeEnem;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeEnem = valorCotaOfExeEnem/300;
+                const totalcotaPrcExeEnem = valorCotaPrcExeEnem/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalEnem = valorFinalDistEnem-valorFinalExeEnem;
+
+            //---ENEM | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---ENEM | FIM
+
+
+
+            // CALCULAR O SALDO GERAL DE COTAS PARA A UNIDADE
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvert = converterMesPTparaEN(nomeMes);
+            const ttServOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'],
+                    idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
                 },
-        },
-        include: [
-            { model: db.omes, attributes: ['nome'] },
-            { model: db.users, attributes: ['name'] }
-        ],
-        group: ['idome', 'ome.nome', 'user.name'],
-        raw: true,
-    });
+                group: ['matricula'],
+                
+            });
+            const ttServicoOf = ttServOf.length;
 
-//----UNIDADES | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
-    const SequelizeExecut = require('sequelize');
-    const total_cotaexeunidade = await db.pjesgercota.findAll({
-        attributes: [
-            'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
-            [SequelizeExecut.literal('SUM(ttofexe)'), 'total_cotaofexe'],
-            [SequelizeExecut.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
-            [SequelizeExecut.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
-            [SequelizeExecut.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
-        ],
-        where: 
-            {id_ome:req.user.dataValues.omeId,
-            ano,
-            mes,
-            operacao: {
-                [SequelizeExecut.Op.like]: 'PJES GOVERNO%'
+            
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST'],
+                    idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
                 },
-            },
-        include: [
-            { model: db.omes, attributes: ['nome'] },
-        ],
-        group: ['id_ome', 'ome.nome'],
-        raw: true,
-    });
+                group: ['matricula'],
+                
+            });
+            const ttServicoPrc = ttServPrc.length;
+
+            const totalcotaOfDistGeral = totalcotaOfDistUnidade + totalcotaOfDistPe + totalcotaOfDistTi + totalcotaOfDistEnem;
+            const totalcotaPrcDistGeral = totalcotaPrcDistUnidade + totalcotaPrcDistPe + totalcotaPrcDistTi + totalcotaPrcDistEnem;
+
+            const saldocotaOfGeral = totalcotaOfDistGeral - ttServicoOf;
+            const saldocotaPrcGeral = totalcotaPrcDistGeral - ttServicoPrc;
 
 
-//--- UNIDADES | INICIO CALCULAR OS VALORES TOTAIS POR UNIDADES-------------------------------------------------------------------------
 
-    //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS UNIDADES
-    const SequelizeDistUnidade = require('sequelize');
-    const valorfinal_cotadistunidade = await db.pjes.findAll({
-        attributes: [
-            [SequelizeDistUnidade.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
-            [SequelizeDistUnidade.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
-        ],
-        where: {
-                idome:req.user.dataValues.omeId,
-                ano,
-                mes,
-                operacao: {
-                    [SequelizeDistUnidade.Op.like]: 'PJES GOVERNO%'
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            const dataAtual = new Date();
+            const anoAtual = dataAtual.getFullYear();
+            const mesAtual = dataAtual.getMonth() + 1; // Mês atual (janeiro é 0, fevereiro é 1, ..., dezembro é 11)
+
+            const somaCtgeralinicialof = await db.tetopjes.sum('ctgeralinicialof', {
+                where: {
+                    ano: anoAtual,
+                    mes: {[Sequelize.Op.lte]: mesAtual},
+                }
+            });
+            
+            const somaTtofexe = await db.pjesgercota.sum('ttofexe', {
+                    where: {
+                        ano: anoAtual,
+                        mes: {[Sequelize.Op.lte]: mesAtual},
+                        operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'}
+                    }
+                });
+
+            const saldoCtRenOfAnual = somaCtgeralinicialof - somaTtofexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            
+
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+            const somaCtgeralinicialprc = await db.tetopjes.sum('ctgeralinicialprc', {
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+            const somaTtprcexe = await db.pjesgercota.sum('ttprcexe', {
+                where: {
+                    ano:anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual },
+                    operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'},
+                }
+            });
+            const saldoCtRenPrcAnual = somaCtgeralinicialprc - somaTtprcexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+
+
+
+            // INICIO -  CONSULTA PARA TRAZER O TETO DE OFICIAIS E PRAÇAS DA TABELA tetopjes
+            const ttgeralinicialofmes = await db.tetopjes.findOne({
+                attributes: ['id', 'ctgeralinicialof', 'ctgeralinicialprc', 'mes', 'ano'],
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+
+
+            //---CALCULO TOTAL - PARTE SUPERIOR DA TELA PJES | INICIO
+            const ctGeralInicialOf = ttgeralinicialofmes.ctgeralinicialof; //Passando os valores da consulta acima
+            const ctGeralInicialPrc = ttgeralinicialofmes.ctgeralinicialprc; //Passando os valores da consulta acima
+            const valorGeralInicial = ctGeralInicialOf*300 + ctGeralInicialPrc*200;
+
+            const totalcotaOfDistGov = totalcotaOfDistUnidade;
+            const totalcotaPrcDistGov = totalcotaPrcDistUnidade; 
+            const totalcotaDistGov = totalcotaOfDistGov + totalcotaPrcDistGov;
+
+            const totalcotaOfExeGov = totalcotaOfExeUnidade;
+            const totalcotaPrcExeGov = totalcotaPrcExeUnidade; 
+            const totalcotaExeGov = totalcotaOfExeGov + totalcotaPrcExeGov;
+
+            const ctAtualOf = ctGeralInicialOf - totalcotaOfDistGov;
+            const ctAtualPrc = ctGeralInicialPrc - totalcotaPrcDistGov;
+
+
+            //TOTAL DE EVENTOS CADASTRADOS PARA A OME | COUNT
+            const queryPjes = await db.pjes.count({
+                where: {idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], mes, ano, },
+            });
+
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvertido = converterMesPTparaEN(nomeMes);
+
+            const ttServExcessoOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcOf = ttServExcessoOf.length;
+        
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServExcessoPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcPrc = ttServExcessoPrc.length;
+
+            // MOSTRA O VALOR TOTAL DE EXCESSO DE OFICIAIS E PRAÇAS
+            const valorttServExc = (parseFloat(ttServExcOf) * 300) + (parseFloat(ttServExcPrc) * 200);
+
+            //TOTAL DE POLICIAIS IMPEDIDOS COM COTA NA OME | COUNT   
+            const contagemImpedidos = await db.escalas.count({
+                attributes: ['id','operacao', 'cod', 'nunfunc', 'pg', 'matricula', 'nome','telefone','status', 'modalidade', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', 'ome_sgpm', 'localap', 'anotacoes', 'idevento', 'idome', 'createdAt', 'updatedAt'],
+                    where: Sequelize.literal(`
+                        DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}' AND
+                        YEAR(data_inicio) = ${nomeAno} AND
+                        idome = ${2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17} AND
+                        status = 'IMPEDIDO'`),
+            });
+            
+
+            // INICIO BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+            const SequelizeRem = require('sequelize');
+            const total_cotadistRen = await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    [SequelizeRem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                    [SequelizeRem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                    [SequelizeRem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                    [SequelizeRem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                ],
+                where: { 
+                    mes,
+                    ano,
+                    idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                    operacao: "PJES GOVERNO REMANESCENTE",
                 },
                 
-        },
-        raw: true,
-    });
+                raw: true,
+            });
 
-    //VALOR DE COTAS EXECUTADAS OFICIAIS UNIDADES
-    const SequelizeExecutUnidade = require('sequelize');
-    const valorfinal_cotaexeunidade = await db.pjesgercota.findAll({
-        attributes: [
-            [SequelizeExecutUnidade.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
-            [SequelizeExecutUnidade.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
-        ],
-        where: {
-                id_ome:req.user.dataValues.omeId,
-                ano,
-                mes,
-                operacao: {
-                    [SequelizeExecutUnidade.Op.like]: 'PJES GOVERNO%'
+            const valorCotaOfDistRen = parseFloat(total_cotadistRen[0]?.total_cotaofdist_multiplicado) || 0;
+            const valorCotaPrcDistRen = parseFloat(total_cotadistRen[0]?.total_cotaprcdist_multiplicado) || 0;
+            const totalcotaOfDistRen = valorCotaOfDistRen/300;
+            const totalcotaPrcDistRen = valorCotaPrcDistRen/200;
+
+            const totalFinalDistRen = valorCotaOfDistRen + valorCotaPrcDistRen;
+        
+                SaldoAnualOfGov = ctGeralInicialOf - totalcotaOfExeGov;
+                SaldoAnualPrcGov = ctGeralInicialPrc - totalcotaPrcExeGov;
+            // FIM BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+
+
+            const user = await db.users.findOne({
+                attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'createdAt'],
+                where: {
+                    id: req.user.dataValues.id
                 },
-        },
-        raw: true,
-    });
-
-//---UNIDADES | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR UNIDADES-------------------------------------------------------------------------
-
-    // CALCULO DO VALOR DISTRIBUIDO
-    const valorCotaOfDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaofdist_multiplicado) || 0;
-    const valorCotaPrcDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaprcdist_multiplicado) || 0;
-    const valorFinalDistUnidade = valorCotaOfDistUnidade + valorCotaPrcDistUnidade;
-
-    // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
-    const totalcotaOfDistUnidade = valorCotaOfDistUnidade/300;
-    const totalcotaPrcDistUnidade = valorCotaPrcDistUnidade/200;
+                include: [{
+                    model: db.situations,
+                    attributes: ['nameSituation']
+                }]
+            });
 
 
-    // CALCULO DO VALOR EXECUTADO
-    const valorCotaOfExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaofexe_multiplicado) || 0;
-    const valorCotaPrcExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaprcexe_multiplicado) || 0;
-    const valorFinalExeUnidade = valorCotaOfExeUnidade + valorCotaPrcExeUnidade;
+            // Consulta para obter os Pjes com inclusão da soma de escalas onde pg = 'ST' ou 'CB' e 'CEL' ou 'MAJ'
+            await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    // Subconsulta para contar pg = 'ST' ou 'CB'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'ST' OR escalas.pg = '1º SGT'
+                                OR escalas.pg = '2º SGT'  OR escalas.pg = '3º SGT' 
+                                OR escalas.pg = 'CB'  OR escalas.pg = 'SD')
+                        )`),
+                        'count_pg_prc'
+                    ],
+                    // Subconsulta para contar pg = 'CEL' ou 'MAJ'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'CEL' OR escalas.pg = 'TC'
+                                OR escalas.pg = 'MAJ'  OR escalas.pg = 'CAP' 
+                                OR escalas.pg = '1º TEN'  OR escalas.pg = '2º TEN')
+                        )`),
+                        'count_pg_of'
+                    ]
+                ],
+                where: {
+                    ano, mes, idome:[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                },
+                order: [['id', 'DESC']],
+                include: [
+                    { model: db.omes, attributes: ['nome'] },
+                    { model: db.users, attributes: ['name'] }
+                ],
+                
+            })
+            .then((pjes) => {
 
-    // CALCULO DO TOTAL DE COTAS EXECUTADAS
-    const totalcotaOfExeUnidade = valorCotaOfExeUnidade/300;
-    const totalcotaPrcExeUnidade = valorCotaPrcExeUnidade/200;
+                if (pjes.length !== 0) {
+                    
+                        res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, sidebarSituations: true,
+                        pjes: pjes.map(id => id.toJSON()),
+                        valorFinalDistUnidade, valorFinalExeUnidade, saldoFinalUnidade, total_cotadistunidade, total_cotaexeunidade, totalcotaOfDistUnidade,
+                        totalcotaPrcDistUnidade, totalcotaOfExeUnidade, totalcotaPrcExeUnidade,
 
-    // CALCULO DO SALDO FINAL
-    const saldoFinalUnidade = valorFinalDistUnidade-valorFinalExeUnidade;
+                        valorFinalDistPe, valorFinalExePe, saldoFinalPe, total_cotadistpe,
+                        total_cotaexepe, totalcotaOfDistPe, totalcotaPrcDistPe, totalcotaOfExePe,
+                        totalcotaPrcExePe,
 
-//---UNIDADES | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+                        valorFinalDistTi, valorFinalExeTi, saldoFinalTi, total_cotadistti,
+                        total_cotaexeti, totalcotaOfDistTi, totalcotaPrcDistTi, totalcotaOfExeTi,
+                        totalcotaPrcExeTi,
+
+                        valorFinalDistEnem, valorFinalExeEnem, saldoFinalEnem, total_cotadistenem,
+                        total_cotaexeenem, totalcotaOfDistEnem, totalcotaPrcDistEnem, totalcotaOfExeEnem,
+                        totalcotaPrcExeEnem,
+
+                        totalcotaOfDistGeral, queryPjes, contagemImpedidos, totalcotaPrcDistGeral, saldocotaOfGeral, saldocotaPrcGeral,
+
+                        ctAtualOf,ctAtualPrc, valorGeralInicial, ctGeralInicialOf, ctGeralInicialPrc, valorGeralInicial,
+                        totalcotaDistGov, totalcotaExeGov, totalcotaOfDistGov, totalcotaPrcDistGov, totalcotaOfExeGov,
+                        totalcotaPrcExeGov, ttServExcOf, ttServExcPrc, valorttServExc, totalFinalDistRen, totalcotaOfDistRen,
+                        totalcotaPrcDistRen, SaldoAnualOfGov, SaldoAnualPrcGov, saldoCtRenOfAnual, saldoCtRenPrcAnual,
+
+                        
+                    });
+                } else {
+                    res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                    });
+                }
+
+            })
+            .catch(() => {
+                res.render("unidade/unidadepjes/list", {
+                    layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                });
+            });
 
 
-//---PE | INICIO
+    } // FIM IF DIM ----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    // INICIO DIRESP ---------------------------------------------------------------------------------------------------------------------------------------------
+    if (req.user.dataValues.omeId == 3){ 
+
+        const countPjes = await db.pjes.count();
+                
+                if (countPjes === 0) {
+                    return res.render("unidade/unidadepjes/list", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum pjes encontrada!' });
+                }
+
+
+            //---UNIDADES | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelize = require('sequelize');
+                const total_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelize.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelize.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelize.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelize.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                            idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            ano,
+                            mes,
+                            operacao: {
+                                [Sequelize.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----UNIDADES | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecut = require('sequelize');
+                const total_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecut.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecut.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecut.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecut.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                        ano,
+                        mes,
+                        operacao: {
+                            [SequelizeExecut.Op.like]: 'PJES GOVERNO%'
+                            },
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+
+            //--- UNIDADES | INICIO CALCULAR OS VALORES TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS UNIDADES
+                const SequelizeDistUnidade = require('sequelize');
+                const valorfinal_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistUnidade.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistUnidade.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeDistUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                            
+                    },
+                    raw: true,
+                });
+
+                //VALOR DE COTAS EXECUTADAS OFICIAIS UNIDADES
+                const SequelizeExecutUnidade = require('sequelize');
+                const valorfinal_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutUnidade.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutUnidade.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeExecutUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    raw: true,
+                });
+
+            //---UNIDADES | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistUnidade = valorCotaOfDistUnidade + valorCotaPrcDistUnidade;
+
+                // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistUnidade = valorCotaOfDistUnidade/300;
+                const totalcotaPrcDistUnidade = valorCotaPrcDistUnidade/200;
+
+
+                // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeUnidade = valorCotaOfExeUnidade + valorCotaPrcExeUnidade;
+
+                // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeUnidade = valorCotaOfExeUnidade/300;
+                const totalcotaPrcExeUnidade = valorCotaPrcExeUnidade/200;
+
+                // CALCULO DO SALDO FINAL
+                const saldoFinalUnidade = valorFinalDistUnidade-valorFinalExeUnidade;
+
+            //---UNIDADES | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+
+            //---PE | INICIO
+
+        //---PE | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizepe = require('sequelize');
+                const total_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizepe.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizepe.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizepe.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizepe.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----PE | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutpe = require('sequelize');
+                const total_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutpe.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutpe.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- PE | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistPe = require('sequelize');
+                const valorfinal_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistPe.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistPe.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS PE
+                const SequelizeExecutPe = require('sequelize');
+                const valorfinal_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutPe.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutPe.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //---PE | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistPe = valorCotaOfDistPe + valorCotaPrcDistPe;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistPe = valorCotaOfDistPe/300;
+                const totalcotaPrcDistPe = valorCotaPrcDistPe/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExePe = valorCotaOfExePe + valorCotaPrcExePe;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExePe = valorCotaOfExePe/300;
+                const totalcotaPrcExePe = valorCotaPrcExePe/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalPe = valorFinalDistPe-valorFinalExePe;
+
+        //---PE | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---PE | FIM
+
+    //---TI | INICIO
+
+                //---TI | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeti = require('sequelize');
+                const total_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeti.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeti.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeti.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeti.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----TI | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutti = require('sequelize');
+                const total_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutti.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutti.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- TI | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistTi = require('sequelize');
+                const valorfinal_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistTi.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistTi.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS TI
+                const SequelizeExecutTi = require('sequelize');
+                const valorfinal_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutTi.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutTi.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //---TI | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistTi = valorCotaOfDistTi + valorCotaPrcDistTi;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistTi = valorCotaOfDistTi/300;
+                const totalcotaPrcDistTi = valorCotaPrcDistTi/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeTi = valorCotaOfExeTi + valorCotaPrcExeTi;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeTi = valorCotaOfExeTi/300;
+                const totalcotaPrcExeTi = valorCotaPrcExeTi/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalTi = valorFinalDistTi-valorFinalExeTi;
+
+            //---TI | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---TI | FIM
+
+    //---ENEM | INICIO
+
+                //---ENEM | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeenem = require('sequelize');
+                const total_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeenem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeenem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----ENEM | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutenem = require('sequelize');
+                const total_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutenem.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutenem.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- ENEM | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS ENEM
+                const SequelizeDistEnem = require('sequelize');
+                const valorfinal_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistEnem.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistEnem.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS ENEM
+                const SequelizeExecutEnem = require('sequelize');
+                const valorfinal_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutEnem.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutEnem.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //---ENEM | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistEnem = valorCotaOfDistTi + valorCotaPrcDistEnem;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistEnem = valorCotaOfDistEnem/300;
+                const totalcotaPrcDistEnem = valorCotaPrcDistEnem/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeEnem = valorCotaOfExeEnem + valorCotaPrcExeEnem;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeEnem = valorCotaOfExeEnem/300;
+                const totalcotaPrcExeEnem = valorCotaPrcExeEnem/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalEnem = valorFinalDistEnem-valorFinalExeEnem;
+
+            //---ENEM | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---ENEM | FIM
+
+
+
+            // CALCULAR O SALDO GERAL DE COTAS PARA A UNIDADE
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvert = converterMesPTparaEN(nomeMes);
+            const ttServOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'],
+                    idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                },
+                group: ['matricula'],
+                
+            });
+            const ttServicoOf = ttServOf.length;
+
+            
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST'],
+                    idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                },
+                group: ['matricula'],
+                
+            });
+            const ttServicoPrc = ttServPrc.length;
+
+            const totalcotaOfDistGeral = totalcotaOfDistUnidade + totalcotaOfDistPe + totalcotaOfDistTi + totalcotaOfDistEnem;
+            const totalcotaPrcDistGeral = totalcotaPrcDistUnidade + totalcotaPrcDistPe + totalcotaPrcDistTi + totalcotaPrcDistEnem;
+
+            const saldocotaOfGeral = totalcotaOfDistGeral - ttServicoOf;
+            const saldocotaPrcGeral = totalcotaPrcDistGeral - ttServicoPrc;
+
+
+
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            const dataAtual = new Date();
+            const anoAtual = dataAtual.getFullYear();
+            const mesAtual = dataAtual.getMonth() + 1; // Mês atual (janeiro é 0, fevereiro é 1, ..., dezembro é 11)
+
+            const somaCtgeralinicialof = await db.tetopjes.sum('ctgeralinicialof', {
+                where: {
+                    ano: anoAtual,
+                    mes: {[Sequelize.Op.lte]: mesAtual},
+                }
+            });
+            
+            const somaTtofexe = await db.pjesgercota.sum('ttofexe', {
+                    where: {
+                        ano: anoAtual,
+                        mes: {[Sequelize.Op.lte]: mesAtual},
+                        operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'}
+                    }
+                });
+
+            const saldoCtRenOfAnual = somaCtgeralinicialof - somaTtofexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            
+
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+            const somaCtgeralinicialprc = await db.tetopjes.sum('ctgeralinicialprc', {
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+            const somaTtprcexe = await db.pjesgercota.sum('ttprcexe', {
+                where: {
+                    ano:anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual },
+                    operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'},
+                }
+            });
+            const saldoCtRenPrcAnual = somaCtgeralinicialprc - somaTtprcexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+
+
+
+            // INICIO -  CONSULTA PARA TRAZER O TETO DE OFICIAIS E PRAÇAS DA TABELA tetopjes
+            const ttgeralinicialofmes = await db.tetopjes.findOne({
+                attributes: ['id', 'ctgeralinicialof', 'ctgeralinicialprc', 'mes', 'ano'],
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+
+
+            //---CALCULO TOTAL - PARTE SUPERIOR DA TELA PJES | INICIO
+            const ctGeralInicialOf = ttgeralinicialofmes.ctgeralinicialof; //Passando os valores da consulta acima
+            const ctGeralInicialPrc = ttgeralinicialofmes.ctgeralinicialprc; //Passando os valores da consulta acima
+            const valorGeralInicial = ctGeralInicialOf*300 + ctGeralInicialPrc*200;
+
+            const totalcotaOfDistGov = totalcotaOfDistUnidade;
+            const totalcotaPrcDistGov = totalcotaPrcDistUnidade; 
+            const totalcotaDistGov = totalcotaOfDistGov + totalcotaPrcDistGov;
+
+            const totalcotaOfExeGov = totalcotaOfExeUnidade;
+            const totalcotaPrcExeGov = totalcotaPrcExeUnidade; 
+            const totalcotaExeGov = totalcotaOfExeGov + totalcotaPrcExeGov;
+
+            const ctAtualOf = ctGeralInicialOf - totalcotaOfDistGov;
+            const ctAtualPrc = ctGeralInicialPrc - totalcotaPrcDistGov;
+
+
+            //TOTAL DE EVENTOS CADASTRADOS PARA A OME | COUNT
+            const queryPjes = await db.pjes.count({
+                where: {idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33], mes, ano, },
+            });
+
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvertido = converterMesPTparaEN(nomeMes);
+
+            const ttServExcessoOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcOf = ttServExcessoOf.length;
+        
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServExcessoPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcPrc = ttServExcessoPrc.length;
+
+            // MOSTRA O VALOR TOTAL DE EXCESSO DE OFICIAIS E PRAÇAS
+            const valorttServExc = (parseFloat(ttServExcOf) * 300) + (parseFloat(ttServExcPrc) * 200);
+
+            //TOTAL DE POLICIAIS IMPEDIDOS COM COTA NA OME | COUNT   
+            const contagemImpedidos = await db.escalas.count({
+                attributes: ['id','operacao', 'cod', 'nunfunc', 'pg', 'matricula', 'nome','telefone','status', 'modalidade', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', 'ome_sgpm', 'localap', 'anotacoes', 'idevento', 'idome', 'createdAt', 'updatedAt'],
+                    where: Sequelize.literal(`
+                        DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}' AND
+                        YEAR(data_inicio) = ${nomeAno} AND
+                        idome = ${3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33} AND
+                        status = 'IMPEDIDO'`),
+            });
+            
+
+            // INICIO BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+            const SequelizeRem = require('sequelize');
+            const total_cotadistRen = await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    [SequelizeRem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                    [SequelizeRem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                    [SequelizeRem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                    [SequelizeRem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                ],
+                where: { 
+                    mes,
+                    ano,
+                    idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                    operacao: "PJES GOVERNO REMANESCENTE",
+                },
+                
+                raw: true,
+            });
+
+            const valorCotaOfDistRen = parseFloat(total_cotadistRen[0]?.total_cotaofdist_multiplicado) || 0;
+            const valorCotaPrcDistRen = parseFloat(total_cotadistRen[0]?.total_cotaprcdist_multiplicado) || 0;
+            const totalcotaOfDistRen = valorCotaOfDistRen/300;
+            const totalcotaPrcDistRen = valorCotaPrcDistRen/200;
+
+            const totalFinalDistRen = valorCotaOfDistRen + valorCotaPrcDistRen;
+        
+                SaldoAnualOfGov = ctGeralInicialOf - totalcotaOfExeGov;
+                SaldoAnualPrcGov = ctGeralInicialPrc - totalcotaPrcExeGov;
+            // FIM BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+
+
+            const user = await db.users.findOne({
+                attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'createdAt'],
+                where: {
+                    id: req.user.dataValues.id
+                },
+                include: [{
+                    model: db.situations,
+                    attributes: ['nameSituation']
+                }]
+            });
+
+
+            // Consulta para obter os Pjes com inclusão da soma de escalas onde pg = 'ST' ou 'CB' e 'CEL' ou 'MAJ'
+            await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    // Subconsulta para contar pg = 'ST' ou 'CB'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'ST' OR escalas.pg = '1º SGT'
+                                OR escalas.pg = '2º SGT'  OR escalas.pg = '3º SGT' 
+                                OR escalas.pg = 'CB'  OR escalas.pg = 'SD')
+                        )`),
+                        'count_pg_prc'
+                    ],
+                    // Subconsulta para contar pg = 'CEL' ou 'MAJ'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'CEL' OR escalas.pg = 'TC'
+                                OR escalas.pg = 'MAJ'  OR escalas.pg = 'CAP' 
+                                OR escalas.pg = '1º TEN'  OR escalas.pg = '2º TEN')
+                        )`),
+                        'count_pg_of'
+                    ]
+                ],
+                where: {
+                    ano, mes, idome:[3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33],
+                },
+                order: [['id', 'DESC']],
+                include: [
+                    { model: db.omes, attributes: ['nome'] },
+                    { model: db.users, attributes: ['name'] }
+                ],
+                
+            })
+            .then((pjes) => {
+
+                if (pjes.length !== 0) {
+                    
+                        res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, sidebarSituations: true,
+                        pjes: pjes.map(id => id.toJSON()),
+                        valorFinalDistUnidade, valorFinalExeUnidade, saldoFinalUnidade, total_cotadistunidade, total_cotaexeunidade, totalcotaOfDistUnidade,
+                        totalcotaPrcDistUnidade, totalcotaOfExeUnidade, totalcotaPrcExeUnidade,
+
+                        valorFinalDistPe, valorFinalExePe, saldoFinalPe, total_cotadistpe,
+                        total_cotaexepe, totalcotaOfDistPe, totalcotaPrcDistPe, totalcotaOfExePe,
+                        totalcotaPrcExePe,
+
+                        valorFinalDistTi, valorFinalExeTi, saldoFinalTi, total_cotadistti,
+                        total_cotaexeti, totalcotaOfDistTi, totalcotaPrcDistTi, totalcotaOfExeTi,
+                        totalcotaPrcExeTi,
+
+                        valorFinalDistEnem, valorFinalExeEnem, saldoFinalEnem, total_cotadistenem,
+                        total_cotaexeenem, totalcotaOfDistEnem, totalcotaPrcDistEnem, totalcotaOfExeEnem,
+                        totalcotaPrcExeEnem,
+
+                        totalcotaOfDistGeral, queryPjes, contagemImpedidos, totalcotaPrcDistGeral, saldocotaOfGeral, saldocotaPrcGeral,
+
+                        ctAtualOf,ctAtualPrc, valorGeralInicial, ctGeralInicialOf, ctGeralInicialPrc, valorGeralInicial,
+                        totalcotaDistGov, totalcotaExeGov, totalcotaOfDistGov, totalcotaPrcDistGov, totalcotaOfExeGov,
+                        totalcotaPrcExeGov, ttServExcOf, ttServExcPrc, valorttServExc, totalFinalDistRen, totalcotaOfDistRen,
+                        totalcotaPrcDistRen, SaldoAnualOfGov, SaldoAnualPrcGov, saldoCtRenOfAnual, saldoCtRenPrcAnual,
+
+                        
+                    });
+                } else {
+                    res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                    });
+                }
+
+            })
+            .catch(() => {
+                res.render("unidade/unidadepjes/list", {
+                    layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                });
+            });
+
+
+    } // FIM IF DIRESP -------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    // INICIO DINTER I ---------------------------------------------------------------------------------------------------------------------------------------------
+    if (req.user.dataValues.omeId == 4){ 
+
+        const countPjes = await db.pjes.count();
+                
+                if (countPjes === 0) {
+                    return res.render("unidade/unidadepjes/list", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum pjes encontrada!' });
+                }
+
+            //---UNIDADES | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelize = require('sequelize');
+                const total_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelize.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelize.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelize.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelize.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                            idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            ano,
+                            mes,
+                            operacao: {
+                                [Sequelize.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----UNIDADES | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecut = require('sequelize');
+                const total_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecut.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecut.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecut.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecut.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                        ano,
+                        mes,
+                        operacao: {
+                            [SequelizeExecut.Op.like]: 'PJES GOVERNO%'
+                            },
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+
+            //--- UNIDADES | INICIO CALCULAR OS VALORES TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS UNIDADES
+                const SequelizeDistUnidade = require('sequelize');
+                const valorfinal_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistUnidade.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistUnidade.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeDistUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                            
+                    },
+                    raw: true,
+                });
+
+                //VALOR DE COTAS EXECUTADAS OFICIAIS UNIDADES
+                const SequelizeExecutUnidade = require('sequelize');
+                const valorfinal_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutUnidade.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutUnidade.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeExecutUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    raw: true,
+                });
+
+            //---UNIDADES | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistUnidade = valorCotaOfDistUnidade + valorCotaPrcDistUnidade;
+
+                // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistUnidade = valorCotaOfDistUnidade/300;
+                const totalcotaPrcDistUnidade = valorCotaPrcDistUnidade/200;
+
+
+                // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeUnidade = valorCotaOfExeUnidade + valorCotaPrcExeUnidade;
+
+                // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeUnidade = valorCotaOfExeUnidade/300;
+                const totalcotaPrcExeUnidade = valorCotaPrcExeUnidade/200;
+
+                // CALCULO DO SALDO FINAL
+                const saldoFinalUnidade = valorFinalDistUnidade-valorFinalExeUnidade;
+
+            //---UNIDADES | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+
+            //---PE | INICIO
+
+        //---PE | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizepe = require('sequelize');
+                const total_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizepe.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizepe.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizepe.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizepe.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----PE | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutpe = require('sequelize');
+                const total_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutpe.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutpe.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- PE | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistPe = require('sequelize');
+                const valorfinal_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistPe.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistPe.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS PE
+                const SequelizeExecutPe = require('sequelize');
+                const valorfinal_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutPe.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutPe.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //---PE | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistPe = valorCotaOfDistPe + valorCotaPrcDistPe;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistPe = valorCotaOfDistPe/300;
+                const totalcotaPrcDistPe = valorCotaPrcDistPe/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExePe = valorCotaOfExePe + valorCotaPrcExePe;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExePe = valorCotaOfExePe/300;
+                const totalcotaPrcExePe = valorCotaPrcExePe/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalPe = valorFinalDistPe-valorFinalExePe;
+
+        //---PE | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---PE | FIM
+
+    //---TI | INICIO
+
+                //---TI | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeti = require('sequelize');
+                const total_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeti.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeti.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeti.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeti.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----TI | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutti = require('sequelize');
+                const total_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutti.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutti.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- TI | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistTi = require('sequelize');
+                const valorfinal_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistTi.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistTi.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS TI
+                const SequelizeExecutTi = require('sequelize');
+                const valorfinal_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutTi.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutTi.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //---TI | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistTi = valorCotaOfDistTi + valorCotaPrcDistTi;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistTi = valorCotaOfDistTi/300;
+                const totalcotaPrcDistTi = valorCotaPrcDistTi/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeTi = valorCotaOfExeTi + valorCotaPrcExeTi;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeTi = valorCotaOfExeTi/300;
+                const totalcotaPrcExeTi = valorCotaPrcExeTi/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalTi = valorFinalDistTi-valorFinalExeTi;
+
+            //---TI | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---TI | FIM
+
+    //---ENEM | INICIO
+
+                //---ENEM | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeenem = require('sequelize');
+                const total_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeenem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeenem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----ENEM | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutenem = require('sequelize');
+                const total_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutenem.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutenem.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- ENEM | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS ENEM
+                const SequelizeDistEnem = require('sequelize');
+                const valorfinal_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistEnem.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistEnem.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS ENEM
+                const SequelizeExecutEnem = require('sequelize');
+                const valorfinal_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutEnem.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutEnem.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //---ENEM | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistEnem = valorCotaOfDistTi + valorCotaPrcDistEnem;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistEnem = valorCotaOfDistEnem/300;
+                const totalcotaPrcDistEnem = valorCotaPrcDistEnem/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeEnem = valorCotaOfExeEnem + valorCotaPrcExeEnem;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeEnem = valorCotaOfExeEnem/300;
+                const totalcotaPrcExeEnem = valorCotaPrcExeEnem/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalEnem = valorFinalDistEnem-valorFinalExeEnem;
+
+            //---ENEM | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---ENEM | FIM
+
+
+
+            // CALCULAR O SALDO GERAL DE COTAS PARA A UNIDADE
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvert = converterMesPTparaEN(nomeMes);
+            const ttServOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'],
+                    idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                },
+                group: ['matricula'],
+                
+            });
+            const ttServicoOf = ttServOf.length;
+
+            
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST'],
+                    idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                },
+                group: ['matricula'],
+                
+            });
+            const ttServicoPrc = ttServPrc.length;
+
+            const totalcotaOfDistGeral = totalcotaOfDistUnidade + totalcotaOfDistPe + totalcotaOfDistTi + totalcotaOfDistEnem;
+            const totalcotaPrcDistGeral = totalcotaPrcDistUnidade + totalcotaPrcDistPe + totalcotaPrcDistTi + totalcotaPrcDistEnem;
+
+            const saldocotaOfGeral = totalcotaOfDistGeral - ttServicoOf;
+            const saldocotaPrcGeral = totalcotaPrcDistGeral - ttServicoPrc;
+
+
+
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            const dataAtual = new Date();
+            const anoAtual = dataAtual.getFullYear();
+            const mesAtual = dataAtual.getMonth() + 1; // Mês atual (janeiro é 0, fevereiro é 1, ..., dezembro é 11)
+
+            const somaCtgeralinicialof = await db.tetopjes.sum('ctgeralinicialof', {
+                where: {
+                    ano: anoAtual,
+                    mes: {[Sequelize.Op.lte]: mesAtual},
+                }
+            });
+            
+            const somaTtofexe = await db.pjesgercota.sum('ttofexe', {
+                    where: {
+                        ano: anoAtual,
+                        mes: {[Sequelize.Op.lte]: mesAtual},
+                        operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'}
+                    }
+                });
+
+            const saldoCtRenOfAnual = somaCtgeralinicialof - somaTtofexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            
+
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+            const somaCtgeralinicialprc = await db.tetopjes.sum('ctgeralinicialprc', {
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+            const somaTtprcexe = await db.pjesgercota.sum('ttprcexe', {
+                where: {
+                    ano:anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual },
+                    operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'},
+                }
+            });
+            const saldoCtRenPrcAnual = somaCtgeralinicialprc - somaTtprcexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+
+
+
+            // INICIO -  CONSULTA PARA TRAZER O TETO DE OFICIAIS E PRAÇAS DA TABELA tetopjes
+            const ttgeralinicialofmes = await db.tetopjes.findOne({
+                attributes: ['id', 'ctgeralinicialof', 'ctgeralinicialprc', 'mes', 'ano'],
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+
+
+            //---CALCULO TOTAL - PARTE SUPERIOR DA TELA PJES | INICIO
+            const ctGeralInicialOf = ttgeralinicialofmes.ctgeralinicialof; //Passando os valores da consulta acima
+            const ctGeralInicialPrc = ttgeralinicialofmes.ctgeralinicialprc; //Passando os valores da consulta acima
+            const valorGeralInicial = ctGeralInicialOf*300 + ctGeralInicialPrc*200;
+
+            const totalcotaOfDistGov = totalcotaOfDistUnidade;
+            const totalcotaPrcDistGov = totalcotaPrcDistUnidade; 
+            const totalcotaDistGov = totalcotaOfDistGov + totalcotaPrcDistGov;
+
+            const totalcotaOfExeGov = totalcotaOfExeUnidade;
+            const totalcotaPrcExeGov = totalcotaPrcExeUnidade; 
+            const totalcotaExeGov = totalcotaOfExeGov + totalcotaPrcExeGov;
+
+            const ctAtualOf = ctGeralInicialOf - totalcotaOfDistGov;
+            const ctAtualPrc = ctGeralInicialPrc - totalcotaPrcDistGov;
+
+
+            //TOTAL DE EVENTOS CADASTRADOS PARA A OME | COUNT
+            const queryPjes = await db.pjes.count({
+                where: {idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49], mes, ano, },
+            });
+
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvertido = converterMesPTparaEN(nomeMes);
+
+            const ttServExcessoOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcOf = ttServExcessoOf.length;
+        
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServExcessoPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcPrc = ttServExcessoPrc.length;
+
+            // MOSTRA O VALOR TOTAL DE EXCESSO DE OFICIAIS E PRAÇAS
+            const valorttServExc = (parseFloat(ttServExcOf) * 300) + (parseFloat(ttServExcPrc) * 200);
+
+            //TOTAL DE POLICIAIS IMPEDIDOS COM COTA NA OME | COUNT   
+            const contagemImpedidos = await db.escalas.count({
+                attributes: ['id','operacao', 'cod', 'nunfunc', 'pg', 'matricula', 'nome','telefone','status', 'modalidade', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', 'ome_sgpm', 'localap', 'anotacoes', 'idevento', 'idome', 'createdAt', 'updatedAt'],
+                    where: Sequelize.literal(`
+                        DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}' AND
+                        YEAR(data_inicio) = ${nomeAno} AND
+                        idome = ${4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49} AND
+                        status = 'IMPEDIDO'`),
+            });
+            
+
+            // INICIO BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+            const SequelizeRem = require('sequelize');
+            const total_cotadistRen = await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    [SequelizeRem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                    [SequelizeRem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                    [SequelizeRem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                    [SequelizeRem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                ],
+                where: { 
+                    mes,
+                    ano,
+                    idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                    operacao: "PJES GOVERNO REMANESCENTE",
+                },
+                
+                raw: true,
+            });
+
+            const valorCotaOfDistRen = parseFloat(total_cotadistRen[0]?.total_cotaofdist_multiplicado) || 0;
+            const valorCotaPrcDistRen = parseFloat(total_cotadistRen[0]?.total_cotaprcdist_multiplicado) || 0;
+            const totalcotaOfDistRen = valorCotaOfDistRen/300;
+            const totalcotaPrcDistRen = valorCotaPrcDistRen/200;
+
+            const totalFinalDistRen = valorCotaOfDistRen + valorCotaPrcDistRen;
+        
+                SaldoAnualOfGov = ctGeralInicialOf - totalcotaOfExeGov;
+                SaldoAnualPrcGov = ctGeralInicialPrc - totalcotaPrcExeGov;
+            // FIM BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+
+
+            const user = await db.users.findOne({
+                attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'createdAt'],
+                where: {
+                    id: req.user.dataValues.id
+                },
+                include: [{
+                    model: db.situations,
+                    attributes: ['nameSituation']
+                }]
+            });
+
+
+            // Consulta para obter os Pjes com inclusão da soma de escalas onde pg = 'ST' ou 'CB' e 'CEL' ou 'MAJ'
+            await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    // Subconsulta para contar pg = 'ST' ou 'CB'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'ST' OR escalas.pg = '1º SGT'
+                                OR escalas.pg = '2º SGT'  OR escalas.pg = '3º SGT' 
+                                OR escalas.pg = 'CB'  OR escalas.pg = 'SD')
+                        )`),
+                        'count_pg_prc'
+                    ],
+                    // Subconsulta para contar pg = 'CEL' ou 'MAJ'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'CEL' OR escalas.pg = 'TC'
+                                OR escalas.pg = 'MAJ'  OR escalas.pg = 'CAP' 
+                                OR escalas.pg = '1º TEN'  OR escalas.pg = '2º TEN')
+                        )`),
+                        'count_pg_of'
+                    ]
+                ],
+                where: {
+                    ano, mes, idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                },
+                order: [['id', 'DESC']],
+                include: [
+                    { model: db.omes, attributes: ['nome'] },
+                    { model: db.users, attributes: ['name'] }
+                ],
+                
+            })
+            .then((pjes) => {
+
+                if (pjes.length !== 0) {
+                    
+                        res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, sidebarSituations: true,
+                        pjes: pjes.map(id => id.toJSON()),
+                        valorFinalDistUnidade, valorFinalExeUnidade, saldoFinalUnidade, total_cotadistunidade, total_cotaexeunidade, totalcotaOfDistUnidade,
+                        totalcotaPrcDistUnidade, totalcotaOfExeUnidade, totalcotaPrcExeUnidade,
+
+                        valorFinalDistPe, valorFinalExePe, saldoFinalPe, total_cotadistpe,
+                        total_cotaexepe, totalcotaOfDistPe, totalcotaPrcDistPe, totalcotaOfExePe,
+                        totalcotaPrcExePe,
+
+                        valorFinalDistTi, valorFinalExeTi, saldoFinalTi, total_cotadistti,
+                        total_cotaexeti, totalcotaOfDistTi, totalcotaPrcDistTi, totalcotaOfExeTi,
+                        totalcotaPrcExeTi,
+
+                        valorFinalDistEnem, valorFinalExeEnem, saldoFinalEnem, total_cotadistenem,
+                        total_cotaexeenem, totalcotaOfDistEnem, totalcotaPrcDistEnem, totalcotaOfExeEnem,
+                        totalcotaPrcExeEnem,
+
+                        totalcotaOfDistGeral, queryPjes, contagemImpedidos, totalcotaPrcDistGeral, saldocotaOfGeral, saldocotaPrcGeral,
+
+                        ctAtualOf,ctAtualPrc, valorGeralInicial, ctGeralInicialOf, ctGeralInicialPrc, valorGeralInicial,
+                        totalcotaDistGov, totalcotaExeGov, totalcotaOfDistGov, totalcotaPrcDistGov, totalcotaOfExeGov,
+                        totalcotaPrcExeGov, ttServExcOf, ttServExcPrc, valorttServExc, totalFinalDistRen, totalcotaOfDistRen,
+                        totalcotaPrcDistRen, SaldoAnualOfGov, SaldoAnualPrcGov, saldoCtRenOfAnual, saldoCtRenPrcAnual,
+
+                        
+                    });
+                } else {
+                    res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                    });
+                }
+
+            })
+            .catch(() => {
+                res.render("unidade/unidadepjes/list", {
+                    layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                });
+            });
+
+
+    } // FIM IF DINTER I -------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    // INICIO DINTER II ---------------------------------------------------------------------------------------------------------------------------------------------
+    if (req.user.dataValues.omeId == 5){ 
+
+        const countPjes = await db.pjes.count();
+                
+                if (countPjes === 0) {
+                    return res.render("unidade/unidadepjes/list", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum pjes encontrada!' });
+                }
+
+            //---UNIDADES | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelize = require('sequelize');
+                const total_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelize.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelize.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelize.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelize.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                            idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            ano,
+                            mes,
+                            operacao: {
+                                [Sequelize.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----UNIDADES | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecut = require('sequelize');
+                const total_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecut.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecut.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecut.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecut.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                        ano,
+                        mes,
+                        operacao: {
+                            [SequelizeExecut.Op.like]: 'PJES GOVERNO%'
+                            },
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+
+            //--- UNIDADES | INICIO CALCULAR OS VALORES TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS UNIDADES
+                const SequelizeDistUnidade = require('sequelize');
+                const valorfinal_cotadistunidade = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistUnidade.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistUnidade.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeDistUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                            
+                    },
+                    raw: true,
+                });
+
+                //VALOR DE COTAS EXECUTADAS OFICIAIS UNIDADES
+                const SequelizeExecutUnidade = require('sequelize');
+                const valorfinal_cotaexeunidade = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutUnidade.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutUnidade.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            ano,
+                            mes,
+                            operacao: {
+                                [SequelizeExecutUnidade.Op.like]: 'PJES GOVERNO%'
+                            },
+                    },
+                    raw: true,
+                });
+
+            //---UNIDADES | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+                // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistUnidade = valorCotaOfDistUnidade + valorCotaPrcDistUnidade;
+
+                // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistUnidade = valorCotaOfDistUnidade/300;
+                const totalcotaPrcDistUnidade = valorCotaPrcDistUnidade/200;
+
+
+                // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeUnidade = valorCotaOfExeUnidade + valorCotaPrcExeUnidade;
+
+                // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeUnidade = valorCotaOfExeUnidade/300;
+                const totalcotaPrcExeUnidade = valorCotaPrcExeUnidade/200;
+
+                // CALCULO DO SALDO FINAL
+                const saldoFinalUnidade = valorFinalDistUnidade-valorFinalExeUnidade;
+
+            //---UNIDADES | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+
+            //---PE | INICIO
+
+        //---PE | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizepe = require('sequelize');
+                const total_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizepe.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizepe.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizepe.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizepe.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----PE | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutpe = require('sequelize');
+                const total_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutpe.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutpe.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutpe.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                        mes,
+                        ano,
+                        operacao: "PJES PATRULHA ESCOLAR",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- PE | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistPe = require('sequelize');
+                const valorfinal_cotadistpe = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistPe.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistPe.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS PE
+                const SequelizeExecutPe = require('sequelize');
+                const valorfinal_cotaexepe = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutPe.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutPe.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            mes,
+                            ano,
+                            operacao: "PJES PATRULHA ESCOLAR",
+                    },
+                    raw: true,
+                });
+
+            //---PE | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistPe = parseFloat(valorfinal_cotadistpe[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistPe = valorCotaOfDistPe + valorCotaPrcDistPe;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistPe = valorCotaOfDistPe/300;
+                const totalcotaPrcDistPe = valorCotaPrcDistPe/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExePe = parseFloat(valorfinal_cotaexepe[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExePe = valorCotaOfExePe + valorCotaPrcExePe;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExePe = valorCotaOfExePe/300;
+                const totalcotaPrcExePe = valorCotaPrcExePe/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalPe = valorFinalDistPe-valorFinalExePe;
+
+        //---PE | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---PE | FIM
+
+    //---TI | INICIO
+
+                //---TI | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeti = require('sequelize');
+                const total_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeti.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeti.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeti.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeti.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----TI | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutti = require('sequelize');
+                const total_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutti.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutti.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutti.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                        mes,
+                        ano,
+                        operacao: "PJES CTM (BRT)",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- TI | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS PE
+                const SequelizeDistTi = require('sequelize');
+                const valorfinal_cotadistti = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistTi.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistTi.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS TI
+                const SequelizeExecutTi = require('sequelize');
+                const valorfinal_cotaexeti = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutTi.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutTi.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            mes,
+                            ano,
+                            operacao: "PJES CTM (BRT)",
+                    },
+                    raw: true,
+                });
+
+            //---TI | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistTi = parseFloat(valorfinal_cotadistti[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistTi = valorCotaOfDistTi + valorCotaPrcDistTi;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistTi = valorCotaOfDistTi/300;
+                const totalcotaPrcDistTi = valorCotaPrcDistTi/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeTi = parseFloat(valorfinal_cotaexeti[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeTi = valorCotaOfExeTi + valorCotaPrcExeTi;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeTi = valorCotaOfExeTi/300;
+                const totalcotaPrcExeTi = valorCotaPrcExeTi/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalTi = valorFinalDistTi-valorFinalExeTi;
+
+            //---TI | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---TI | FIM
+
+    //---ENEM | INICIO
+
+                //---ENEM | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+                const Sequelizeenem = require('sequelize');
+                const total_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                        [Sequelizeenem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                        [Sequelizeenem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                        [Sequelizeenem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                    ],
+                    where: 
+                        {
+                        idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                    },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                        { model: db.users, attributes: ['name'] }
+                    ],
+                    group: ['idome', 'ome.nome', 'user.name'],
+                    raw: true,
+                });
+
+            //----ENEM | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+                const SequelizeExecutenem = require('sequelize');
+                const total_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                        [SequelizeExecutenem.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                        [SequelizeExecutenem.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                        [SequelizeExecutenem.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                    ],
+                    where: 
+                        {
+                        id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                        mes,
+                        ano,
+                        operacao: "PJES OP ENEM",
+                        },
+                    include: [
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    group: ['id_ome', 'ome.nome'],
+                    raw: true,
+                });
+
+            //--- ENEM | INICIO CALCULAR OS VALORES TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS ENEM
+                const SequelizeDistEnem = require('sequelize');
+                const valorfinal_cotadistenem = await db.pjes.findAll({
+                    attributes: [
+                        [SequelizeDistEnem.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                        [SequelizeDistEnem.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                    ],
+                    where: {
+                            idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS ENEM
+                const SequelizeExecutEnem = require('sequelize');
+                const valorfinal_cotaexeenem = await db.pjesgercota.findAll({
+                    attributes: [
+                        [SequelizeExecutEnem.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                        [SequelizeExecutEnem.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                    ],
+                    where: {
+                            id_ome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                            mes,
+                            ano,
+                            operacao: "PJES OP ENEM",
+                    },
+                    raw: true,
+                });
+
+            //---ENEM | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+                const valorCotaOfDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaofdist_multiplicado) || 0;
+                const valorCotaPrcDistEnem = parseFloat(valorfinal_cotadistenem[0]?.valor_cotaprcdist_multiplicado) || 0;
+                const valorFinalDistEnem = valorCotaOfDistTi + valorCotaPrcDistEnem;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+                const totalcotaOfDistEnem = valorCotaOfDistEnem/300;
+                const totalcotaPrcDistEnem = valorCotaPrcDistEnem/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+                const valorCotaOfExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaofexe_multiplicado) || 0;
+                const valorCotaPrcExeEnem = parseFloat(valorfinal_cotaexeenem[0]?.valor_cotaprcexe_multiplicado) || 0;
+                const valorFinalExeEnem = valorCotaOfExeEnem + valorCotaPrcExeEnem;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+                const totalcotaOfExeEnem = valorCotaOfExeEnem/300;
+                const totalcotaPrcExeEnem = valorCotaPrcExeEnem/200;
+
+            // CALCULO DO SALDO FINAL
+                const saldoFinalEnem = valorFinalDistEnem-valorFinalExeEnem;
+
+            //---ENEM | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+    //---ENEM | FIM
+
+
+
+            // CALCULAR O SALDO GERAL DE COTAS PARA A UNIDADE
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvert = converterMesPTparaEN(nomeMes);
+            const ttServOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'],
+                    idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                },
+                group: ['matricula'],
+                
+            });
+            const ttServicoOf = ttServOf.length;
+
+            
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST'],
+                    idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                },
+                group: ['matricula'],
+                
+            });
+            const ttServicoPrc = ttServPrc.length;
+
+            const totalcotaOfDistGeral = totalcotaOfDistUnidade + totalcotaOfDistPe + totalcotaOfDistTi + totalcotaOfDistEnem;
+            const totalcotaPrcDistGeral = totalcotaPrcDistUnidade + totalcotaPrcDistPe + totalcotaPrcDistTi + totalcotaPrcDistEnem;
+
+            const saldocotaOfGeral = totalcotaOfDistGeral - ttServicoOf;
+            const saldocotaPrcGeral = totalcotaPrcDistGeral - ttServicoPrc;
+
+
+
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            const dataAtual = new Date();
+            const anoAtual = dataAtual.getFullYear();
+            const mesAtual = dataAtual.getMonth() + 1; // Mês atual (janeiro é 0, fevereiro é 1, ..., dezembro é 11)
+
+            const somaCtgeralinicialof = await db.tetopjes.sum('ctgeralinicialof', {
+                where: {
+                    ano: anoAtual,
+                    mes: {[Sequelize.Op.lte]: mesAtual},
+                }
+            });
+            
+            const somaTtofexe = await db.pjesgercota.sum('ttofexe', {
+                    where: {
+                        ano: anoAtual,
+                        mes: {[Sequelize.Op.lte]: mesAtual},
+                        operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'}
+                    }
+                });
+
+            const saldoCtRenOfAnual = somaCtgeralinicialof - somaTtofexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+            
+
+            // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+            const somaCtgeralinicialprc = await db.tetopjes.sum('ctgeralinicialprc', {
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+            const somaTtprcexe = await db.pjesgercota.sum('ttprcexe', {
+                where: {
+                    ano:anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual },
+                    operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'},
+                }
+            });
+            const saldoCtRenPrcAnual = somaCtgeralinicialprc - somaTtprcexe;
+            // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+
+
+
+            // INICIO -  CONSULTA PARA TRAZER O TETO DE OFICIAIS E PRAÇAS DA TABELA tetopjes
+            const ttgeralinicialofmes = await db.tetopjes.findOne({
+                attributes: ['id', 'ctgeralinicialof', 'ctgeralinicialprc', 'mes', 'ano'],
+                where: {
+                    ano: anoAtual,
+                    mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+                }});
+
+
+            //---CALCULO TOTAL - PARTE SUPERIOR DA TELA PJES | INICIO
+            const ctGeralInicialOf = ttgeralinicialofmes.ctgeralinicialof; //Passando os valores da consulta acima
+            const ctGeralInicialPrc = ttgeralinicialofmes.ctgeralinicialprc; //Passando os valores da consulta acima
+            const valorGeralInicial = ctGeralInicialOf*300 + ctGeralInicialPrc*200;
+
+            const totalcotaOfDistGov = totalcotaOfDistUnidade;
+            const totalcotaPrcDistGov = totalcotaPrcDistUnidade; 
+            const totalcotaDistGov = totalcotaOfDistGov + totalcotaPrcDistGov;
+
+            const totalcotaOfExeGov = totalcotaOfExeUnidade;
+            const totalcotaPrcExeGov = totalcotaPrcExeUnidade; 
+            const totalcotaExeGov = totalcotaOfExeGov + totalcotaPrcExeGov;
+
+            const ctAtualOf = ctGeralInicialOf - totalcotaOfDistGov;
+            const ctAtualPrc = ctGeralInicialPrc - totalcotaPrcDistGov;
+
+
+            //TOTAL DE EVENTOS CADASTRADOS PARA A OME | COUNT
+            const queryPjes = await db.pjes.count({
+                where: {idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62], mes, ano, },
+            });
+
+
+            function converterMesPTparaEN(nomeMesPT) {
+                switch (nomeMesPT) {
+                    case 'JAN':
+                        return 'JAN';
+                    case 'FEV':
+                        return 'FEB';
+                    case 'MAR':
+                        return 'MAR';
+                    case 'ABR':
+                        return 'APR';
+                    case 'MAI':
+                        return 'MAY';
+                    case 'JUN':
+                        return 'JUN';
+                    case 'JUL':
+                        return 'JUL';
+                    case 'AGO':
+                        return 'AUG';
+                    case 'SET':
+                        return 'SEP';
+                    case 'OUT':
+                        return 'OCT';
+                    case 'NOV':
+                        return 'NOV';
+                    case 'DEZ':
+                        return 'DEC';
+                    default:
+                        return nomeMesPT;
+                }
+            }
+
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const nomeMesConvertido = converterMesPTparaEN(nomeMes);
+
+            const ttServExcessoOf = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcOf = ttServExcessoOf.length;
+        
+            // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+            const ttServExcessoPrc = await db.escalas.findAll({
+                attributes: [
+                    'matricula',
+                    [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+                ],
+                where: {
+                    data_inicio: {
+                        [Op.and]: [
+                            Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                            Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                        ]
+                    },
+                    pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
+                },
+                group: ['matricula'],
+                having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+            });
+            const ttServExcPrc = ttServExcessoPrc.length;
+
+            // MOSTRA O VALOR TOTAL DE EXCESSO DE OFICIAIS E PRAÇAS
+            const valorttServExc = (parseFloat(ttServExcOf) * 300) + (parseFloat(ttServExcPrc) * 200);
+
+            //TOTAL DE POLICIAIS IMPEDIDOS COM COTA NA OME | COUNT   
+            const contagemImpedidos = await db.escalas.count({
+                attributes: ['id','operacao', 'cod', 'nunfunc', 'pg', 'matricula', 'nome','telefone','status', 'modalidade', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', 'ome_sgpm', 'localap', 'anotacoes', 'idevento', 'idome', 'createdAt', 'updatedAt'],
+                    where: Sequelize.literal(`
+                        DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}' AND
+                        YEAR(data_inicio) = ${nomeAno} AND
+                        idome = ${5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62} AND
+                        status = 'IMPEDIDO'`),
+            });
+            
+
+            // INICIO BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+            const SequelizeRem = require('sequelize');
+            const total_cotadistRen = await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    [SequelizeRem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                    [SequelizeRem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                    [SequelizeRem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                    [SequelizeRem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                ],
+                where: { 
+                    mes,
+                    ano,
+                    idome:[5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+                    operacao: "PJES GOVERNO REMANESCENTE",
+                },
+                
+                raw: true,
+            });
+
+            const valorCotaOfDistRen = parseFloat(total_cotadistRen[0]?.total_cotaofdist_multiplicado) || 0;
+            const valorCotaPrcDistRen = parseFloat(total_cotadistRen[0]?.total_cotaprcdist_multiplicado) || 0;
+            const totalcotaOfDistRen = valorCotaOfDistRen/300;
+            const totalcotaPrcDistRen = valorCotaPrcDistRen/200;
+
+            const totalFinalDistRen = valorCotaOfDistRen + valorCotaPrcDistRen;
+        
+                SaldoAnualOfGov = ctGeralInicialOf - totalcotaOfExeGov;
+                SaldoAnualPrcGov = ctGeralInicialPrc - totalcotaPrcExeGov;
+            // FIM BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+
+
+            const user = await db.users.findOne({
+                attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'createdAt'],
+                where: {
+                    id: req.user.dataValues.id
+                },
+                include: [{
+                    model: db.situations,
+                    attributes: ['nameSituation']
+                }]
+            });
+
+
+            // Consulta para obter os Pjes com inclusão da soma de escalas onde pg = 'ST' ou 'CB' e 'CEL' ou 'MAJ'
+            await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    // Subconsulta para contar pg = 'ST' ou 'CB'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'ST' OR escalas.pg = '1º SGT'
+                                OR escalas.pg = '2º SGT'  OR escalas.pg = '3º SGT' 
+                                OR escalas.pg = 'CB'  OR escalas.pg = 'SD')
+                        )`),
+                        'count_pg_prc'
+                    ],
+                    // Subconsulta para contar pg = 'CEL' ou 'MAJ'
+                    [
+                        Sequelize.literal(`(
+                            SELECT SUM(ttcota)
+                            FROM escalas 
+                            WHERE escalas.idevento = pjes.id
+                            AND (escalas.pg = 'CEL' OR escalas.pg = 'TC'
+                                OR escalas.pg = 'MAJ'  OR escalas.pg = 'CAP' 
+                                OR escalas.pg = '1º TEN'  OR escalas.pg = '2º TEN')
+                        )`),
+                        'count_pg_of'
+                    ]
+                ],
+                where: {
+                    ano, mes, idome:[4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+                },
+                order: [['id', 'DESC']],
+                include: [
+                    { model: db.omes, attributes: ['nome'] },
+                    { model: db.users, attributes: ['name'] }
+                ],
+                
+            })
+            .then((pjes) => {
+
+                if (pjes.length !== 0) {
+                    
+                        res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, sidebarSituations: true,
+                        pjes: pjes.map(id => id.toJSON()),
+                        valorFinalDistUnidade, valorFinalExeUnidade, saldoFinalUnidade, total_cotadistunidade, total_cotaexeunidade, totalcotaOfDistUnidade,
+                        totalcotaPrcDistUnidade, totalcotaOfExeUnidade, totalcotaPrcExeUnidade,
+
+                        valorFinalDistPe, valorFinalExePe, saldoFinalPe, total_cotadistpe,
+                        total_cotaexepe, totalcotaOfDistPe, totalcotaPrcDistPe, totalcotaOfExePe,
+                        totalcotaPrcExePe,
+
+                        valorFinalDistTi, valorFinalExeTi, saldoFinalTi, total_cotadistti,
+                        total_cotaexeti, totalcotaOfDistTi, totalcotaPrcDistTi, totalcotaOfExeTi,
+                        totalcotaPrcExeTi,
+
+                        valorFinalDistEnem, valorFinalExeEnem, saldoFinalEnem, total_cotadistenem,
+                        total_cotaexeenem, totalcotaOfDistEnem, totalcotaPrcDistEnem, totalcotaOfExeEnem,
+                        totalcotaPrcExeEnem,
+
+                        totalcotaOfDistGeral, queryPjes, contagemImpedidos, totalcotaPrcDistGeral, saldocotaOfGeral, saldocotaPrcGeral,
+
+                        ctAtualOf,ctAtualPrc, valorGeralInicial, ctGeralInicialOf, ctGeralInicialPrc, valorGeralInicial,
+                        totalcotaDistGov, totalcotaExeGov, totalcotaOfDistGov, totalcotaPrcDistGov, totalcotaOfExeGov,
+                        totalcotaPrcExeGov, ttServExcOf, ttServExcPrc, valorttServExc, totalFinalDistRen, totalcotaOfDistRen,
+                        totalcotaPrcDistRen, SaldoAnualOfGov, SaldoAnualPrcGov, saldoCtRenOfAnual, saldoCtRenPrcAnual,
+
+                        
+                    });
+                } else {
+                    res.render("unidade/unidadepjes/list", {
+                        layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                    });
+                }
+
+            })
+            .catch(() => {
+                res.render("unidade/unidadepjes/list", {
+                    layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                });
+            });
+
+
+    } // FIM IF DINTER II -------------------------------------------------------------------------------------------------------------------------------------------
+
+
+            const countPjes = await db.pjes.count();            
+            if (countPjes === 0) {
+                return res.render("unidade/unidadepjes/list", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum pjes encontrada!' });
+            }
+
+        //---UNIDADES | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
+            const Sequelize = require('sequelize');
+            const total_cotadistunidade = await db.pjes.findAll({
+                attributes: [
+                    'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                    [Sequelize.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                    [Sequelize.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                    [Sequelize.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                    [Sequelize.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+                ],
+                where: 
+                    {
+                        idome:req.user.dataValues.omeId,
+                        ano,
+                        mes,
+                        operacao: {
+                            [Sequelize.Op.like]: 'PJES GOVERNO%'
+                        },
+                },
+                include: [
+                    { model: db.omes, attributes: ['nome'] },
+                    { model: db.users, attributes: ['name'] }
+                ],
+                group: ['idome', 'ome.nome', 'user.name'],
+                raw: true,
+            });
+
+        //----UNIDADES | INICIO TABELA DE COTAS EXECUTADAS-------------------------------------------------------------------------
+            const SequelizeExecut = require('sequelize');
+            const total_cotaexeunidade = await db.pjesgercota.findAll({
+                attributes: [
+                    'id', 'operacao', 'id_ome', 'ttofexe', 'ttprcexe', 'status', 'mes', 'ano', 'obs',
+                    [SequelizeExecut.literal('SUM(ttofexe)'), 'total_cotaofexe'],
+                    [SequelizeExecut.literal('SUM(ttprcexe)'), 'total_cotaprcexe'],
+                    [SequelizeExecut.literal('SUM(ttofexe) * 300'), 'total_cotaofexe_multiplicado'],
+                    [SequelizeExecut.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
+                ],
+                where: 
+                    {id_ome:req.user.dataValues.omeId,
+                    ano,
+                    mes,
+                    operacao: {
+                        [SequelizeExecut.Op.like]: 'PJES GOVERNO%'
+                        },
+                    },
+                include: [
+                    { model: db.omes, attributes: ['nome'] },
+                ],
+                group: ['id_ome', 'ome.nome'],
+                raw: true,
+            });
+
+
+        //--- UNIDADES | INICIO CALCULAR OS VALORES TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+            //VALOR FINAL DE COTAS DISTRIBUIDAS OFICIAIS UNIDADES
+            const SequelizeDistUnidade = require('sequelize');
+            const valorfinal_cotadistunidade = await db.pjes.findAll({
+                attributes: [
+                    [SequelizeDistUnidade.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
+                    [SequelizeDistUnidade.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
+                ],
+                where: {
+                        idome:req.user.dataValues.omeId,
+                        ano,
+                        mes,
+                        operacao: {
+                            [SequelizeDistUnidade.Op.like]: 'PJES GOVERNO%'
+                        },
+                        
+                },
+                raw: true,
+            });
+
+            //VALOR DE COTAS EXECUTADAS OFICIAIS UNIDADES
+            const SequelizeExecutUnidade = require('sequelize');
+            const valorfinal_cotaexeunidade = await db.pjesgercota.findAll({
+                attributes: [
+                    [SequelizeExecutUnidade.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
+                    [SequelizeExecutUnidade.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
+                ],
+                where: {
+                        id_ome:req.user.dataValues.omeId,
+                        ano,
+                        mes,
+                        operacao: {
+                            [SequelizeExecutUnidade.Op.like]: 'PJES GOVERNO%'
+                        },
+                },
+                raw: true,
+            });
+
+        //---UNIDADES | INICIO CALCULAR OS VALORES E COTAS TOTAIS POR UNIDADES-------------------------------------------------------------------------
+
+            // CALCULO DO VALOR DISTRIBUIDO
+            const valorCotaOfDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaofdist_multiplicado) || 0;
+            const valorCotaPrcDistUnidade = parseFloat(valorfinal_cotadistunidade[0]?.valor_cotaprcdist_multiplicado) || 0;
+            const valorFinalDistUnidade = valorCotaOfDistUnidade + valorCotaPrcDistUnidade;
+
+            // CALCULO DO TOTAL DE COTAS DISTRIBUIDAS
+            const totalcotaOfDistUnidade = valorCotaOfDistUnidade/300;
+            const totalcotaPrcDistUnidade = valorCotaPrcDistUnidade/200;
+
+
+            // CALCULO DO VALOR EXECUTADO
+            const valorCotaOfExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaofexe_multiplicado) || 0;
+            const valorCotaPrcExeUnidade = parseFloat(valorfinal_cotaexeunidade[0]?.valor_cotaprcexe_multiplicado) || 0;
+            const valorFinalExeUnidade = valorCotaOfExeUnidade + valorCotaPrcExeUnidade;
+
+            // CALCULO DO TOTAL DE COTAS EXECUTADAS
+            const totalcotaOfExeUnidade = valorCotaOfExeUnidade/300;
+            const totalcotaPrcExeUnidade = valorCotaPrcExeUnidade/200;
+
+            // CALCULO DO SALDO FINAL
+            const saldoFinalUnidade = valorFinalDistUnidade-valorFinalExeUnidade;
+
+        //---UNIDADES | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
+
+
+        //---PE | INICIO
 
     //---PE | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
             const Sequelizepe = require('sequelize');
@@ -261,9 +3649,9 @@ router.get('/', eAdmin, async (req, res) => {
 
     //---PE | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
 
-//---PE | FIM
+    //---PE | FIM
 
-//---TI | INICIO
+    //---TI | INICIO
 
             //---TI | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
             const Sequelizeti = require('sequelize');
@@ -374,9 +3762,9 @@ router.get('/', eAdmin, async (req, res) => {
 
         //---TI | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
 
-//---TI | FIM
+    //---TI | FIM
 
-//---ENEM | INICIO
+    //---ENEM | INICIO
 
             //---ENEM | INICIO TABELA DE COTAS DISTRIBUIDAS-------------------------------------------------------------------------
             const Sequelizeenem = require('sequelize');
@@ -487,392 +3875,385 @@ router.get('/', eAdmin, async (req, res) => {
 
         //---ENEM | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
 
-//---ENEM | FIM
+    //---ENEM | FIM
 
 
+        // CALCULAR O SALDO GERAL DE COTAS PARA A UNIDADE
 
-    // CALCULAR O SALDO GERAL DE COTAS PARA A UNIDADE
-
-    function converterMesPTparaEN(nomeMesPT) {
-        switch (nomeMesPT) {
-            case 'JAN':
-                return 'JAN';
-            case 'FEV':
-                return 'FEB';
-            case 'MAR':
-                return 'MAR';
-            case 'ABR':
-                return 'APR';
-            case 'MAI':
-                return 'MAY';
-            case 'JUN':
-                return 'JUN';
-            case 'JUL':
-                return 'JUL';
-            case 'AGO':
-                return 'AUG';
-            case 'SET':
-                return 'SEP';
-            case 'OUT':
-                return 'OCT';
-            case 'NOV':
-                return 'NOV';
-            case 'DEZ':
-                return 'DEC';
-            default:
-                return nomeMesPT;
+        function converterMesPTparaEN(nomeMesPT) {
+            switch (nomeMesPT) {
+                case 'JAN':
+                    return 'JAN';
+                case 'FEV':
+                    return 'FEB';
+                case 'MAR':
+                    return 'MAR';
+                case 'ABR':
+                    return 'APR';
+                case 'MAI':
+                    return 'MAY';
+                case 'JUN':
+                    return 'JUN';
+                case 'JUL':
+                    return 'JUL';
+                case 'AGO':
+                    return 'AUG';
+                case 'SET':
+                    return 'SEP';
+                case 'OUT':
+                    return 'OCT';
+                case 'NOV':
+                    return 'NOV';
+                case 'DEZ':
+                    return 'DEC';
+                default:
+                    return nomeMesPT;
+            }
         }
-    }
 
-
-    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
-    const nomeMesConvert = converterMesPTparaEN(nomeMes);
-    const ttServOf = await db.escalas.findAll({
-        attributes: [
-            'matricula',
-            [Sequelize.fn('COUNT', Sequelize.col('matricula')), 'count']
-        ],
-        where: {
-            data_inicio: {
-                [Op.and]: [
-                    Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
-                    Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
-                ]
+        // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+        const nomeMesConvert = converterMesPTparaEN(nomeMes);
+        const ttServOf = await db.escalas.findAll({
+            attributes: [
+                'matricula',
+                [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+            ],
+            where: {
+                data_inicio: {
+                    [Op.and]: [
+                        Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                        Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                    ]
+                },
+                pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'],
+                idome:req.user.dataValues.omeId,
             },
-            pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'],
-            idome:req.user.dataValues.omeId,
-        },
-        group: ['matricula'],
-        
-    });
-    const ttServicoOf = ttServOf.length;
+            group: ['matricula'],
+            
+        });
+        const ttServicoOf = ttServOf.length;
 
-    
-    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
-    const ttServPrc = await db.escalas.findAll({
-        attributes: [
-            'matricula',
-            [Sequelize.fn('COUNT', Sequelize.col('matricula')), 'count']
-        ],
-        where: {
-            data_inicio: {
-                [Op.and]: [
-                    Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
-                    Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
-                ]
+        
+        // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+        const ttServPrc = await db.escalas.findAll({
+            attributes: [
+                'matricula',
+                [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+            ],
+            where: {
+                data_inicio: {
+                    [Op.and]: [
+                        Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvert}'`),
+                        Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                    ]
+                },
+                pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST'],
+                idome:req.user.dataValues.omeId,
             },
-            pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST'],
-            idome:req.user.dataValues.omeId,
-        },
-        group: ['matricula'],
-        
-    });
-    const ttServicoPrc = ttServPrc.length;
+            group: ['matricula'],
+            
+        });
+        const ttServicoPrc = ttServPrc.length;
 
-    const totalcotaOfDistGeral = totalcotaOfDistUnidade + totalcotaOfDistPe + totalcotaOfDistTi + totalcotaOfDistPe + totalcotaOfDistEnem;
-    const totalcotaPrcDistGeral = totalcotaPrcDistUnidade + totalcotaPrcDistPe + totalcotaPrcDistTi + totalcotaPrcDistPe + totalcotaPrcDistEnem;
+        const totalcotaOfDistGeral = totalcotaOfDistUnidade + totalcotaOfDistPe + totalcotaOfDistTi + totalcotaOfDistEnem;
+        const totalcotaPrcDistGeral = totalcotaPrcDistUnidade + totalcotaPrcDistPe + totalcotaPrcDistTi + totalcotaPrcDistEnem;
 
-    const saldocotaOfGeral = totalcotaOfDistGeral - ttServicoOf;
-    const saldocotaPrcGeral = totalcotaPrcDistGeral - ttServicoPrc;
+        const saldocotaOfGeral = totalcotaOfDistGeral - ttServicoOf;
+        const saldocotaPrcGeral = totalcotaPrcDistGeral - ttServicoPrc;
 
 
 
-    // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
-    const dataAtual = new Date();
-    const anoAtual = dataAtual.getFullYear();
-    const mesAtual = dataAtual.getMonth() + 1; // Mês atual (janeiro é 0, fevereiro é 1, ..., dezembro é 11)
+        // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+        const dataAtual = new Date();
+        const anoAtual = dataAtual.getFullYear();
+        const mesAtual = dataAtual.getMonth() + 1; // Mês atual (janeiro é 0, fevereiro é 1, ..., dezembro é 11)
 
-    const somaCtgeralinicialof = await db.tetopjes.sum('ctgeralinicialof', {
-        where: {
-            ano: anoAtual,
-            mes: {[Sequelize.Op.lte]: mesAtual},
-        }
-    });
-    
-    const somaTtofexe = await db.pjesgercota.sum('ttofexe', {
+        const somaCtgeralinicialof = await db.tetopjes.sum('ctgeralinicialof', {
             where: {
                 ano: anoAtual,
                 mes: {[Sequelize.Op.lte]: mesAtual},
-                operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'}
             }
         });
-
-    const saldoCtRenOfAnual = somaCtgeralinicialof - somaTtofexe;
-    // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
-    
-
-    // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
-    const somaCtgeralinicialprc = await db.tetopjes.sum('ctgeralinicialprc', {
-        where: {
-            ano: anoAtual,
-            mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
-        }});
-    const somaTtprcexe = await db.pjesgercota.sum('ttprcexe', {
-        where: {
-            ano:anoAtual,
-            mes: { [Sequelize.Op.lte]: mesAtual },
-            operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'},
-        }
-    });
-    const saldoCtRenPrcAnual = somaCtgeralinicialprc - somaTtprcexe;
-    // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
-
-
-
-    // INICIO -  CONSULTA PARA TRAZER O TETO DE OFICIAIS E PRAÇAS DA TABELA tetopjes
-    const ttgeralinicialofmes = await db.tetopjes.findOne({
-        attributes: ['id', 'ctgeralinicialof', 'ctgeralinicialprc', 'mes', 'ano'],
-        where: {
-            ano: anoAtual,
-            mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
-        }});
-
-
-    //---CALCULO TOTAL - PARTE SUPERIOR DA TELA PJES | INICIO
-    const ctGeralInicialOf = ttgeralinicialofmes.ctgeralinicialof; //Passando os valores da consulta acima
-    const ctGeralInicialPrc = ttgeralinicialofmes.ctgeralinicialprc; //Passando os valores da consulta acima
-    const valorGeralInicial = ctGeralInicialOf*300 + ctGeralInicialPrc*200;
-
-    const totalcotaOfDistGov = totalcotaOfDistUnidade;
-    const totalcotaPrcDistGov = totalcotaPrcDistUnidade; 
-    const totalcotaDistGov = totalcotaOfDistGov + totalcotaPrcDistGov;
-
-    const totalcotaOfExeGov = totalcotaOfExeUnidade;
-    const totalcotaPrcExeGov = totalcotaPrcExeUnidade; 
-    const totalcotaExeGov = totalcotaOfExeGov + totalcotaPrcExeGov;
-
-    const ctAtualOf = ctGeralInicialOf - totalcotaOfDistGov;
-    const ctAtualPrc = ctGeralInicialPrc - totalcotaPrcDistGov;
-
-
-    //TOTAL DE EVENTOS CADASTRADOS PARA A OME | COUNT
-    const queryPjes = await db.pjes.count({
-        where: {idome:req.user.dataValues.omeId, mes, ano, },
-    });
-
-
-    function converterMesPTparaEN(nomeMesPT) {
-        switch (nomeMesPT) {
-            case 'JAN':
-                return 'JAN';
-            case 'FEV':
-                return 'FEB';
-            case 'MAR':
-                return 'MAR';
-            case 'ABR':
-                return 'APR';
-            case 'MAI':
-                return 'MAY';
-            case 'JUN':
-                return 'JUN';
-            case 'JUL':
-                return 'JUL';
-            case 'AGO':
-                return 'AUG';
-            case 'SET':
-                return 'SEP';
-            case 'OUT':
-                return 'OCT';
-            case 'NOV':
-                return 'NOV';
-            case 'DEZ':
-                return 'DEC';
-            default:
-                return nomeMesPT;
-        }
-    }
-
-    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
-    const nomeMesConvertido = converterMesPTparaEN(nomeMes);
-
-    const ttServExcessoOf = await db.escalas.findAll({
-        attributes: [
-            'matricula',
-            [Sequelize.fn('COUNT', Sequelize.col('matricula')), 'count']
-        ],
-        where: {
-            data_inicio: {
-                [Op.and]: [
-                    Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
-                    Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
-                ]
-            },
-            pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
-        },
-        group: ['matricula'],
-        having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
-    });
-    const ttServExcOf = ttServExcessoOf.length;
- 
-    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
-    const ttServExcessoPrc = await db.escalas.findAll({
-        attributes: [
-            'matricula',
-            [Sequelize.fn('COUNT', Sequelize.col('matricula')), 'count']
-        ],
-        where: {
-            data_inicio: {
-                [Op.and]: [
-                    Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
-                    Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
-                ]
-            },
-            pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
-        },
-        group: ['matricula'],
-        having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
-    });
-    const ttServExcPrc = ttServExcessoPrc.length;
-
-    // MOSTRA O VALOR TOTAL DE EXCESSO DE OFICIAIS E PRAÇAS
-    const valorttServExc = (parseFloat(ttServExcOf) * 300) + (parseFloat(ttServExcPrc) * 200);
-
-    //TOTAL DE POLICIAIS IMPEDIDOS COM COTA NA OME | COUNT   
-    const contagemImpedidos = await db.escalas.count({
-        attributes: ['id','operacao', 'cod', 'nunfunc', 'pg', 'matricula', 'nome','telefone','status', 'modalidade', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', 'ome_sgpm', 'localap', 'anotacoes', 'idevento', 'idome', 'createdAt', 'updatedAt'],
-            where: Sequelize.literal(`
-                DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}' AND
-                YEAR(data_inicio) = ${nomeAno} AND
-                idome = ${req.user.dataValues.omeId} AND
-                status = 'IMPEDIDO'`),
-    });
-    
-
-    // INICIO BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
-    const SequelizeRem = require('sequelize');
-    const total_cotadistRen = await db.pjes.findAll({
-        attributes: [
-            'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
-            [SequelizeRem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
-            [SequelizeRem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
-            [SequelizeRem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
-            [SequelizeRem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
-        ],
-        where: { 
-            mes,
-            ano,
-            idome:req.user.dataValues.omeId,
-            operacao: "PJES GOVERNO REMANESCENTE",
-        },
         
-        raw: true,
-    });
-
-    const valorCotaOfDistRen = parseFloat(total_cotadistRen[0]?.total_cotaofdist_multiplicado) || 0;
-    const valorCotaPrcDistRen = parseFloat(total_cotadistRen[0]?.total_cotaprcdist_multiplicado) || 0;
-    const totalcotaOfDistRen = valorCotaOfDistRen/300;
-    const totalcotaPrcDistRen = valorCotaPrcDistRen/200;
-
-    const totalFinalDistRen = valorCotaOfDistRen + valorCotaPrcDistRen;
- 
-        SaldoAnualOfGov = ctGeralInicialOf - totalcotaOfExeGov;
-        SaldoAnualPrcGov = ctGeralInicialPrc - totalcotaPrcExeGov;
-    // FIM BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
-
-
-    const user = await db.users.findOne({
-        attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'createdAt'],
-        where: {
-            id: req.user.dataValues.id
-        },
-        include: [{
-            model: db.situations,
-            attributes: ['nameSituation']
-        }]
-    });
-
-
-    // Consulta para obter os Pjes com inclusão da soma de escalas onde pg = 'ST' ou 'CB' e 'CEL' ou 'MAJ'
-    await db.pjes.findAll({
-        attributes: [
-            'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
-            // Subconsulta para contar pg = 'ST' ou 'CB'
-            [
-                Sequelize.literal(`(
-                    SELECT COUNT(*)
-                    FROM escalas 
-                    WHERE escalas.idevento = pjes.id
-                    AND (escalas.pg = 'ST' OR escalas.pg = '1º SGT'
-                        OR escalas.pg = '2º SGT'  OR escalas.pg = '3º SGT' 
-                        OR escalas.pg = 'CB'  OR escalas.pg = 'SD')
-                )`),
-                'count_pg_prc'
-            ],
-            // Subconsulta para contar pg = 'CEL' ou 'MAJ'
-            [
-                Sequelize.literal(`(
-                    SELECT COUNT(*)
-                    FROM escalas 
-                    WHERE escalas.idevento = pjes.id
-                    AND (escalas.pg = 'CEL' OR escalas.pg = 'TC'
-                        OR escalas.pg = 'MAJ'  OR escalas.pg = 'CAP' 
-                        OR escalas.pg = '1º TEN'  OR escalas.pg = '2º TEN')
-                )`),
-                'count_pg_of'
-            ]
-        ],
-        where: {
-            ano, mes, idome:req.user.dataValues.omeId
-        },
-        order: [['id', 'DESC']],
-        include: [
-            { model: db.omes, attributes: ['nome'] },
-            { model: db.users, attributes: ['name'] }
-        ],
-        offset: Number((page * limit) - limit),
-        limit: limit
-
-    })
-    .then((pjes) => {
-
-        if (pjes.length !== 0) {
-            var pagination = {
-                path: '/pjes',
-                page,
-                prev_page_url: ((Number(page) - Number(1)) >= 1) ? Number(page) - Number(1) : false,
-                next_page_url: ((Number(page) + Number(1)) > Number(lastPage)) ? false : Number(page) + Number(1),
-                lastPage
-            }
-            res.render("unidade/unidadepjes/list", {
-                layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, pagination, sidebarSituations: true,
-                pjes: pjes.map(id => id.toJSON()),
-                valorFinalDistUnidade, valorFinalExeUnidade, saldoFinalUnidade, total_cotadistunidade, total_cotaexeunidade, totalcotaOfDistUnidade,
-                totalcotaPrcDistUnidade, totalcotaOfExeUnidade, totalcotaPrcExeUnidade,
-
-                valorFinalDistPe, valorFinalExePe, saldoFinalPe, total_cotadistpe,
-                total_cotaexepe, totalcotaOfDistPe, totalcotaPrcDistPe, totalcotaOfExePe,
-                totalcotaPrcExePe,
-
-                valorFinalDistTi, valorFinalExeTi, saldoFinalTi, total_cotadistti,
-                total_cotaexeti, totalcotaOfDistTi, totalcotaPrcDistTi, totalcotaOfExeTi,
-                totalcotaPrcExeTi,
-
-                valorFinalDistEnem, valorFinalExeEnem, saldoFinalEnem, total_cotadistenem,
-                total_cotaexeenem, totalcotaOfDistEnem, totalcotaPrcDistEnem, totalcotaOfExeEnem,
-                totalcotaPrcExeEnem,
-
-                totalcotaOfDistGeral, queryPjes, contagemImpedidos, totalcotaPrcDistGeral, saldocotaOfGeral, saldocotaPrcGeral,
-
-                ctAtualOf,ctAtualPrc, valorGeralInicial, ctGeralInicialOf, ctGeralInicialPrc, valorGeralInicial,
-                totalcotaDistGov, totalcotaExeGov, totalcotaOfDistGov, totalcotaPrcDistGov, totalcotaOfExeGov,
-                totalcotaPrcExeGov, ttServExcOf, ttServExcPrc, valorttServExc, totalFinalDistRen, totalcotaOfDistRen,
-                totalcotaPrcDistRen, SaldoAnualOfGov, SaldoAnualPrcGov, saldoCtRenOfAnual, saldoCtRenPrcAnual,
-
-                
+        const somaTtofexe = await db.pjesgercota.sum('ttofexe', {
+                where: {
+                    ano: anoAtual,
+                    mes: {[Sequelize.Op.lte]: mesAtual},
+                    operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'}
+                }
             });
-        } else {
+
+        const saldoCtRenOfAnual = somaCtgeralinicialof - somaTtofexe;
+        // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
+        
+
+        // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+        const somaCtgeralinicialprc = await db.tetopjes.sum('ctgeralinicialprc', {
+            where: {
+                ano: anoAtual,
+                mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+            }});
+        const somaTtprcexe = await db.pjesgercota.sum('ttprcexe', {
+            where: {
+                ano:anoAtual,
+                mes: { [Sequelize.Op.lte]: mesAtual },
+                operacao: {[Sequelize.Op.like]: 'PJES GOVERNO%'},
+            }
+        });
+        const saldoCtRenPrcAnual = somaCtgeralinicialprc - somaTtprcexe;
+        // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
+
+
+
+        // INICIO -  CONSULTA PARA TRAZER O TETO DE OFICIAIS E PRAÇAS DA TABELA tetopjes
+        const ttgeralinicialofmes = await db.tetopjes.findOne({
+            attributes: ['id', 'ctgeralinicialof', 'ctgeralinicialprc', 'mes', 'ano'],
+            where: {
+                ano: anoAtual,
+                mes: { [Sequelize.Op.lte]: mesAtual } // A soma é Somente até o mês atual
+            }});
+
+
+        //---CALCULO TOTAL - PARTE SUPERIOR DA TELA PJES | INICIO
+        const ctGeralInicialOf = ttgeralinicialofmes.ctgeralinicialof; //Passando os valores da consulta acima
+        const ctGeralInicialPrc = ttgeralinicialofmes.ctgeralinicialprc; //Passando os valores da consulta acima
+        const valorGeralInicial = ctGeralInicialOf*300 + ctGeralInicialPrc*200;
+
+        const totalcotaOfDistGov = totalcotaOfDistUnidade;
+        const totalcotaPrcDistGov = totalcotaPrcDistUnidade; 
+        const totalcotaDistGov = totalcotaOfDistGov + totalcotaPrcDistGov;
+
+        const totalcotaOfExeGov = totalcotaOfExeUnidade;
+        const totalcotaPrcExeGov = totalcotaPrcExeUnidade; 
+        const totalcotaExeGov = totalcotaOfExeGov + totalcotaPrcExeGov;
+
+        const ctAtualOf = ctGeralInicialOf - totalcotaOfDistGov;
+        const ctAtualPrc = ctGeralInicialPrc - totalcotaPrcDistGov;
+
+
+        //TOTAL DE EVENTOS CADASTRADOS PARA A OME | COUNT
+        const queryPjes = await db.pjes.count({
+            where: {idome:req.user.dataValues.omeId, mes, ano, },
+        });
+
+
+        function converterMesPTparaEN(nomeMesPT) {
+            switch (nomeMesPT) {
+                case 'JAN':
+                    return 'JAN';
+                case 'FEV':
+                    return 'FEB';
+                case 'MAR':
+                    return 'MAR';
+                case 'ABR':
+                    return 'APR';
+                case 'MAI':
+                    return 'MAY';
+                case 'JUN':
+                    return 'JUN';
+                case 'JUL':
+                    return 'JUL';
+                case 'AGO':
+                    return 'AUG';
+                case 'SET':
+                    return 'SEP';
+                case 'OUT':
+                    return 'OCT';
+                case 'NOV':
+                    return 'NOV';
+                case 'DEZ':
+                    return 'DEC';
+                default:
+                    return nomeMesPT;
+            }
+        }
+
+        // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+        const nomeMesConvertido = converterMesPTparaEN(nomeMes);
+
+        const ttServExcessoOf = await db.escalas.findAll({
+            attributes: [
+                'matricula',
+                [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+            ],
+            where: {
+                data_inicio: {
+                    [Op.and]: [
+                        Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                        Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                    ]
+                },
+                pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
+            },
+            group: ['matricula'],
+            having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+        });
+        const ttServExcOf = ttServExcessoOf.length;
+    
+        // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+        const ttServExcessoPrc = await db.escalas.findAll({
+            attributes: [
+                'matricula',
+                [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
+            ],
+            where: {
+                data_inicio: {
+                    [Op.and]: [
+                        Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                        Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                    ]
+                },
+                pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
+            },
+            group: ['matricula'],
+            having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
+        });
+        const ttServExcPrc = ttServExcessoPrc.length;
+
+        // MOSTRA O VALOR TOTAL DE EXCESSO DE OFICIAIS E PRAÇAS
+        const valorttServExc = (parseFloat(ttServExcOf) * 300) + (parseFloat(ttServExcPrc) * 200);
+
+        //TOTAL DE POLICIAIS IMPEDIDOS COM COTA NA OME | COUNT   
+        const contagemImpedidos = await db.escalas.count({
+            attributes: ['id','operacao', 'cod', 'nunfunc', 'pg', 'matricula', 'nome','telefone','status', 'modalidade', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', 'ome_sgpm', 'localap', 'anotacoes', 'idevento', 'idome', 'createdAt', 'updatedAt'],
+                where: Sequelize.literal(`
+                    DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}' AND
+                    YEAR(data_inicio) = ${nomeAno} AND
+                    idome = ${req.user.dataValues.omeId} AND
+                    status = 'IMPEDIDO'`),
+        });
+        
+
+        // INICIO BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+        const SequelizeRem = require('sequelize');
+        const total_cotadistRen = await db.pjes.findAll({
+            attributes: [
+                'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                [SequelizeRem.literal('SUM(cotaofdist)'), 'total_cotaofdist'],
+                [SequelizeRem.literal('SUM(cotaprcdist)'), 'total_cotaprcdist'],
+                [SequelizeRem.literal('SUM(cotaofdist) * 300'), 'total_cotaofdist_multiplicado'],
+                [SequelizeRem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
+            ],
+            where: { 
+                mes,
+                ano,
+                idome:req.user.dataValues.omeId,
+                operacao: "PJES GOVERNO REMANESCENTE",
+            },
+            
+            raw: true,
+        });
+
+        const valorCotaOfDistRen = parseFloat(total_cotadistRen[0]?.total_cotaofdist_multiplicado) || 0;
+        const valorCotaPrcDistRen = parseFloat(total_cotadistRen[0]?.total_cotaprcdist_multiplicado) || 0;
+        const totalcotaOfDistRen = valorCotaOfDistRen/300;
+        const totalcotaPrcDistRen = valorCotaPrcDistRen/200;
+
+        const totalFinalDistRen = valorCotaOfDistRen + valorCotaPrcDistRen;
+    
+            SaldoAnualOfGov = ctGeralInicialOf - totalcotaOfExeGov;
+            SaldoAnualPrcGov = ctGeralInicialPrc - totalcotaPrcExeGov;
+        // FIM BLOCO QUE CONTA A QUANTIDADE REMANESCENTE DE OFICIAS E PRAÇAS
+
+
+        const user = await db.users.findOne({
+            attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'createdAt'],
+            where: {
+                id: req.user.dataValues.id
+            },
+            include: [{
+                model: db.situations,
+                attributes: ['nameSituation']
+            }]
+        });
+
+
+        // Consulta para obter os Pjes com inclusão da soma de escalas onde pg = 'ST' ou 'CB' e 'CEL' ou 'MAJ'
+        await db.pjes.findAll({
+            attributes: [
+                'id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs',
+                // Subconsulta para contar pg = 'ST' ou 'CB'
+                [
+                    Sequelize.literal(`(
+                        SELECT SUM(ttcota)
+                        FROM escalas 
+                        WHERE escalas.idevento = pjes.id
+                        AND (escalas.pg = 'ST' OR escalas.pg = '1º SGT'
+                            OR escalas.pg = '2º SGT'  OR escalas.pg = '3º SGT' 
+                            OR escalas.pg = 'CB'  OR escalas.pg = 'SD')
+                    )`),
+                    'count_pg_prc'
+                ],
+                // Subconsulta para contar pg = 'CEL' ou 'MAJ'
+                [
+                    Sequelize.literal(`(
+                        SELECT SUM(ttcota)
+                        FROM escalas 
+                        WHERE escalas.idevento = pjes.id
+                        AND (escalas.pg = 'CEL' OR escalas.pg = 'TC'
+                            OR escalas.pg = 'MAJ'  OR escalas.pg = 'CAP' 
+                            OR escalas.pg = '1º TEN'  OR escalas.pg = '2º TEN')
+                    )`),
+                    'count_pg_of'
+                ]
+            ],
+            where: {
+                ano, mes, idome:req.user.dataValues.omeId
+            },
+            order: [['id', 'DESC']],
+            include: [
+                { model: db.omes, attributes: ['nome'] },
+                { model: db.users, attributes: ['name'] }
+            ],
+            
+        })
+        .then((pjes) => {
+
+            if (pjes.length !== 0) {
+                
+                    res.render("unidade/unidadepjes/list", {
+                    layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, sidebarSituations: true,
+                    pjes: pjes.map(id => id.toJSON()),
+                    valorFinalDistUnidade, valorFinalExeUnidade, saldoFinalUnidade, total_cotadistunidade, total_cotaexeunidade, totalcotaOfDistUnidade,
+                    totalcotaPrcDistUnidade, totalcotaOfExeUnidade, totalcotaPrcExeUnidade,
+
+                    valorFinalDistPe, valorFinalExePe, saldoFinalPe, total_cotadistpe,
+                    total_cotaexepe, totalcotaOfDistPe, totalcotaPrcDistPe, totalcotaOfExePe,
+                    totalcotaPrcExePe,
+
+                    valorFinalDistTi, valorFinalExeTi, saldoFinalTi, total_cotadistti,
+                    total_cotaexeti, totalcotaOfDistTi, totalcotaPrcDistTi, totalcotaOfExeTi,
+                    totalcotaPrcExeTi,
+
+                    valorFinalDistEnem, valorFinalExeEnem, saldoFinalEnem, total_cotadistenem,
+                    total_cotaexeenem, totalcotaOfDistEnem, totalcotaPrcDistEnem, totalcotaOfExeEnem,
+                    totalcotaPrcExeEnem,
+
+                    totalcotaOfDistGeral, queryPjes, contagemImpedidos, totalcotaPrcDistGeral, saldocotaOfGeral, saldocotaPrcGeral,
+
+                    ctAtualOf,ctAtualPrc, valorGeralInicial, ctGeralInicialOf, ctGeralInicialPrc, valorGeralInicial,
+                    totalcotaDistGov, totalcotaExeGov, totalcotaOfDistGov, totalcotaPrcDistGov, totalcotaOfExeGov,
+                    totalcotaPrcExeGov, ttServExcOf, ttServExcPrc, valorttServExc, totalFinalDistRen, totalcotaOfDistRen,
+                    totalcotaPrcDistRen, SaldoAnualOfGov, SaldoAnualPrcGov, saldoCtRenOfAnual, saldoCtRenPrcAnual,
+
+                    
+                });
+            } else {
+                res.render("unidade/unidadepjes/list", {
+                    layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
+                });
+            }
+
+        })
+        .catch(() => {
             res.render("unidade/unidadepjes/list", {
                 layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
             });
-        }
-
-    })
-    .catch(() => {
-        res.render("unidade/unidadepjes/list", {
-            layout: 'main', profile: req.user.dataValues, sidebarSituations: true, danger_msg: 'Erro: Nenhum Evento Cadastrado!'
         });
-    });
+
 });
+
+
 
 // Criar a rota para página visualizar os detalhes do registro, usar a função eAdmin com middleware para verificar se o usuário está logado
 router.get('/view/:id', eAdmin, async (req, res) => {
@@ -938,7 +4319,7 @@ router.get('/view/:id', eAdmin, async (req, res) => {
                 Sequelize.literal(`'${nomeMesConvertido}'`),
                 'ttservMes'
             ],
-            [Sequelize.fn('COUNT', Sequelize.col('*')), 'totalRegistros']
+            [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'totalRegistros']
         ],
         where: Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
         group: ['matricula']
@@ -956,14 +4337,14 @@ router.get('/view/:id', eAdmin, async (req, res) => {
         escala.dataValues.ttservMes = totalRegistrosPorMatricula[matricula] || 0;
     });
 
-    const cotaofexe = await db.escalas.count({
+    const cotaofexe = await db.escalas.sum('ttcota', {
         where: {
             idevento:id,
             pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'],
         }
     });
     
-    const cotaprcexe = await db.escalas.count({
+    const cotaprcexe = await db.escalas.sum('ttcota', {
         where: {
             idevento:id,
             pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
@@ -1014,6 +4395,8 @@ router.get('/escalas', eAdmin, async (req, res) => {
         dataForm['omes'] = omes;
     }
 
+
+    
     res.render('unidade/unidadepjes/add', { layout: 'main', profile: req.user.dataValues, nomeMes, data: dataForm, sidebarSituations: true });
 
 });
@@ -1024,14 +4407,19 @@ moment.locale('pt-br');
 
 router.post('/escalas/:id', eAdmin, async (req, res) => {
     const nomeMes = req.session.mes;
-    const { data_inicio, ...dataFormulario } = req.body;
+    const { data_inicio, hora_inicio, hora_fim, data_fim, ...dataFormulario } = req.body;
+
+    // Adicionar `hora_inicio`, `hora_fim`, e `data_fim` ao `dataFormulario`
+    dataFormulario.hora_inicio = hora_inicio;
+    dataFormulario.hora_fim = hora_fim;
+    dataFormulario.data_fim = data_fim;
 
     const schema = yup.object().shape({
         nome: yup.string().required("Erro: Necessário preencher o campo nome!")
     });
 
     const escalas = await db.pjes.findOne({
-        attributes: ['id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs','sei', 'ano', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'operacao', 'evento', 'cotaofdist', 'cotaprcdist', 'mes', 'idome', 'iduser', 'obs', 'sei', 'ano', 'createdAt', 'updatedAt'],
         where: {
             id: req.params.id
         },
@@ -1041,50 +4429,50 @@ router.post('/escalas/:id', eAdmin, async (req, res) => {
         ]
     });
 
-
-    if (dataFormulario.operacao === 'PJES GOVERNO REGULAR') {
-        dataFormulario.cod = 247;
-    } else if (dataFormulario.operacao === 'PJES CTM (BRT)') {
-        dataFormulario.cod = 255;
-    } else if (dataFormulario.operacao === 'PJES PATRULHA ESCOLAR') {
-        dataFormulario.cod = 263;
-    } else if (dataFormulario.operacao === 'PJES GOVERNO REMANESCENTE') {
-        dataFormulario.cod = 248;
-    } else if (dataFormulario.operacao === 'PJES OPER CONVIVÊNCIA') {
-        dataFormulario.cod = 249;
-    } else if (dataFormulario.operacao === 'PJES GOVERNO OP ENEM') {
-        dataFormulario.cod = 250;
-    } else if (dataFormulario.operacao === 'PJES ALEPE') {
-        dataFormulario.cod = 251;
-    } else if (dataFormulario.operacao === 'PJES TJPE') {
-        dataFormulario.cod = 252;
-    } else if (dataFormulario.operacao === 'PJES MPPE') {
-        dataFormulario.cod = 253;
-    } else if (dataFormulario.operacao === 'PJES PREFEITURA DE RECIFE') {
-        dataFormulario.cod = 254;
-    } else if (dataFormulario.operacao === 'PJES CBTU') {
-        dataFormulario.cod = 256;
-    } else if (dataFormulario.operacao === 'PJES CPRH') {
-        dataFormulario.cod = 257;
-    } else if (dataFormulario.operacao === 'PJES SEMOC PCR') {
-        dataFormulario.cod = 265;
-    }else {
-        // Defina um valor padrão ou tratamento para outros casos, se necessário
-    }
-
+    // Mapear o código para operação
+    const operationCodes = {
+        'PJES GOVERNO REGULAR': 247,
+        'PJES CTM (BRT)': 255,
+        'PJES PATRULHA ESCOLAR': 263,
+        'PJES GOVERNO REMANESCENTE': 248,
+        'PJES OPER CONVIVÊNCIA': 249,
+        'PJES GOVERNO OP ENEM': 250,
+        'PJES ALEPE': 251,
+        'PJES TJPE': 252,
+        'PJES MPPE': 253,
+        'PJES PREFEITURA DE RECIFE': 254,
+        'PJES CBTU': 256,
+        'PJES CPRH': 257,
+        'PJES SEMOC PCR': 265
+    };
+    
+    dataFormulario.cod = operationCodes[dataFormulario.operacao] || null;
 
     if (!escalas) {
         return res.status(404).send('Evento não encontrado.');
     }
 
-    // Calcular a data limite para cadastro (40 dias após a criação do evento)
-    const dataLimiteCadastro = moment(escalas.createdAt).add(40, 'days');
+    // Calcular a data limite para cadastro (60 dias após a criação do evento)
+    const dataLimiteCadastro = moment(escalas.createdAt).add(60, 'days');
     const dataInicioMoment = moment(data_inicio, 'YYYY-MM-DD');
 
     // Verificar se a data de início está dentro do período permitido
     if (dataInicioMoment.isAfter(dataLimiteCadastro)) {
         return res.redirect('/unidade/unidadepjes/view/' + escalas.id);
-        
+    }
+
+    // Calcular a diferença total entre data_inicio + hora_inicio e data_fim + hora_fim
+    const dataInicioHoraMoment = moment(`${data_inicio} ${hora_inicio}`, 'YYYY-MM-DD HH:mm');
+    const dataFimHoraMoment = moment(`${data_fim} ${hora_fim}`, 'YYYY-MM-DD HH:mm');
+
+    // Calcular a duração total em horas
+    const duracaoHoras = dataFimHoraMoment.diff(dataInicioHoraMoment, 'hours', true);
+
+    // Definir o valor de ttcota baseado na hora_inicio e hora_fim
+    if (hora_inicio === hora_fim) {
+        dataFormulario.ttcota = 2;
+    } else {
+        dataFormulario.ttcota = 1;
     }
 
     // Verificar se todos os campos passaram pela validação
@@ -1101,61 +4489,44 @@ router.post('/escalas/:id', eAdmin, async (req, res) => {
         });
     }
 
+    //CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS DISTRIBUIDA POR EVENTO
+    const ttLimitctof = await db.pjes.sum('cotaofdist', {where: {id: req.params.id,}});
 
-        // CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS EXECUTADAS POR EVENTO
-        const cotaofexe = await db.escalas.count({
-            where: {
-                idevento: req.params.id,
-                pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
-            }
-        });
+    //CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS EXECUTADAS POR EVENTO
+    const cotaofexe = await db.escalas.sum('ttcota', {where: { idevento: req.params.id, pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'] }});
 
-        // CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS DISTRIBUÍDA POR EVENTO
-        const ttLimitctof = await db.pjes.sum('cotaofdist', {
-            where: { id: req.params.id }
-        });
+    //CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS DISTRIBUIDA POR EVENTO
+    const ttLimitctprc = await db.pjes.sum('cotaprcdist', {where: {id: req.params.id,}});
 
-        // CONSULTA PARA VERIFICAR O LIMITE DE COTA DE PRAÇAS EXECUTADAS POR EVENTO
-        const cotaprcexe = await db.escalas.count({
-            where: {
-                idevento: req.params.id,
-                pg: ['ST', '1º SGT', '2º SGT', '3º SGT', 'CB', 'SD']
-            }
-        });
+    //CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS EXECUTADAS POR EVENTO
+    const cotaprcexe = await db.escalas.sum('ttcota', {where: { idevento: req.params.id, pg: ['ST', '1º SGT', '2º SGT', '3º SGT', 'CB', 'SD'] }});
 
-        // CONSULTA PARA VERIFICAR O LIMITE DE COTA DE PRAÇAS DISTRIBUÍDA POR EVENTO
-        const ttLimitctprc = await db.pjes.sum('cotaprcdist', {
-            where: { id: req.params.id }
-        });
+    let errorMessage = "";
 
-            let errorMessage = "";
-        
-            if(dataFormulario.pg === 'CEL' || dataFormulario.pg === 'TC'||
-                dataFormulario.pg === 'MAJ' || dataFormulario.pg === 'CAP' ||
-                dataFormulario.pg === '1º TEN' || dataFormulario.pg === '2º TEN' ||
-                dataFormulario.pg === 'ASP'){
-                if(cotaofexe >= ttLimitctof) {
-                    console.log("Limite de Cotas das oficiais atingido");
-                errorMessage += "Atenção. Limite de Cotas de Oficiais foi atingido. ";
-                }
-            }
+    if (dataFormulario.pg === 'CEL' || dataFormulario.pg === 'TC' ||
+        dataFormulario.pg === 'MAJ' || dataFormulario.pg === 'CAP' ||
+        dataFormulario.pg === '1º TEN' || dataFormulario.pg === '2º TEN' ||
+        dataFormulario.pg === 'ASP') {
+        if (dataFormulario.ttcota + cotaofexe > ttLimitctof) {
+            console.log("Limite de Cotas das oficiais atingido");
+            errorMessage += "Atenção. Limite de Cotas de Oficiais foi atingido. ";
+        }
+    }
 
-            if(dataFormulario.pg === 'ST' || dataFormulario.pg === '1º SGT'||
-                dataFormulario.pg === '2º SGT' || dataFormulario.pg === '3º SGT' ||
-                dataFormulario.pg === 'CB' || dataFormulario.pg === 'SD'){
-                if(cotaprcexe >= ttLimitctprc) {
-                    console.log("Limite de Cotas das Praças foi atingido");
-                errorMessage += "Atenção. Limite de Cotas de Praças foi atingido. ";
-                }
-            }
+    if (dataFormulario.pg === 'ST' || dataFormulario.pg === '1º SGT' ||
+        dataFormulario.pg === '2º SGT' || dataFormulario.pg === '3º SGT' ||
+        dataFormulario.pg === 'CB' || dataFormulario.pg === 'SD') {
+        if (dataFormulario.ttcota + cotaprcexe > ttLimitctprc) {
+            console.log("Limite de Cotas das Praças foi atingido");
+            errorMessage += "Atenção. Limite de Cotas de Praças foi atingido. ";
+        }
+    }
 
-            if (errorMessage) {
-                req.flash("danger_msg", errorMessage);
-                return res.redirect('/unidade/unidadepjes/view/' + req.params.id);
-            }
-
-
-
+    if (errorMessage) {
+        req.flash("danger_msg", errorMessage);
+        return res.redirect('/unidade/unidadepjes/view/' + req.params.id);
+    }
+    
     // Extrair o mês do campo data_inicio e converter para o formato abreviado em português (FEV, MAR, etc.)
     const mesSelecionado = moment(data_inicio, 'YYYY-MM-DD').format('MMM').toUpperCase();
 
@@ -1183,7 +4554,8 @@ router.post('/escalas/:id', eAdmin, async (req, res) => {
             req.flash("success_msg", "Policial Adicionado!");
             res.redirect('/unidade/unidadepjes/view/' + escalas.id);
         })
-        .catch(() => {
+        .catch(error => {
+            console.error("Erro ao salvar no banco de dados:", error);
             return res.render("unidade/unidadepjes/list", { 
                 layout: 'main', 
                 profile: req.user.dataValues, 
@@ -1369,7 +4741,7 @@ router.get('/gerar-arquivo-xls', eAdmin, async (req, res) => {
 
         
         const workbook = new Excel.Workbook();
-        const worksheet = workbook.addWorksheet('Escalas');
+        const worksheet = workbook.addWorksheet('PJES_'+`${req.user.ome.dataValues.nome} - ${nomeMes}_${nomeAno}`);
 
         const fs = require('fs');
         const path = require('path');

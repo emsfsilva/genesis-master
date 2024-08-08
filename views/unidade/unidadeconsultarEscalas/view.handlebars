@@ -1,3 +1,12 @@
+<!-- FullCalendar CSS -->
+<link href='https://unpkg.com/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/fullcalendar@5.11.3/list.min.css' rel='stylesheet' />
+
+<!-- FullCalendar JS -->
+<script src='https://unpkg.com/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://unpkg.com/fullcalendar@5.11.3/list.min.js'></script>
+
+
 <style>
   .center {
     display: flex;
@@ -65,6 +74,73 @@
                     </div>
 
                   </div>
+
+
+                  
+
+
+
+
+
+                          <!-- Criar o contêiner para o calendário -->
+                          <div class="col-md-4 x_panel">
+                            <div id="myCustomCalendar"></div>
+                          </div>
+                          <script id="data" type="application/json">{{{eventosFullCalendar}}}</script>
+                          <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Obter o conteúdo da tag <script> que contém o JSON
+                                var eventosJson = document.getElementById('data').textContent;
+                                  console.log('Conteúdo da tag <script>:', eventosJson);
+                                try {
+                                  // Analisar o JSON
+                                  var eventos = JSON.parse(eventosJson);
+                                  console.log('Eventos do servidor:', eventos);
+                                  var calendarEl = document.getElementById('myCustomCalendar');
+
+                                  var calendar = new FullCalendar.Calendar(calendarEl, {
+                                  initialView: 'dayGridMonth',
+                                  locales: ['pt-br'],
+                                  locale: 'pt-br',
+                                  events: eventos,
+                                  eventColor: '#378006',
+                                  eventClick: function(info) {
+                                      alert('Título: ' + info.event.title + '\nDescrição: ' + info.event.extendedProps.description);
+                                  },
+
+                                  headerToolbar: {left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth'},
+                                  // Configure a exibição de tempo
+                                  views: {dayGridMonth: {displayEventTime: false} },
+                                  listMonth: {buttonText: 'Lista do Mês'}
+                              });
+
+                                  calendar.render();
+                                } catch (e) {
+                                  console.error('Erro ao analisar o JSON dos eventos:', e);
+                                }
+                              });
+                          </script>
+
+                          
+
+
+
+
+
+
+
+              
+
+
+                          
+
+                        
+
+
+
+
+
+
 
 
 

@@ -44,7 +44,7 @@ router.get('/', eAdmin, async (req, res) => {
                 [Sequelizedpo.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
             ],
             where: {
-                idome: [1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+                idome: [1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
                 mes,
                 ano,
                 operacao: {
@@ -71,7 +71,7 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeExecutdpo.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
                 ],
                 where: 
-                    {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+                    {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
                     mes,
                     ano,
                     operacao: {
@@ -94,7 +94,7 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeDistDpo.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
                     [SequelizeDistDpo.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
                 ],
-                where: {idome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+                where: {idome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
                         mes,
                         ano,
                         operacao: {
@@ -111,7 +111,7 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeExecutDpo.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
                     [SequelizeExecutDpo.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
                 ],
-                where: {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+                where: {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
                         mes,
                         ano,
                         operacao: {
@@ -633,7 +633,7 @@ router.get('/', eAdmin, async (req, res) => {
                     [Sequelizepe.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
                 ],
                 where: 
-                    {idome:[70, 72], //DASDH E PE
+                    {idome:[71], //DASDH E PE
                     mes,
                     ano,
                     operacao: "PJES PATRULHA ESCOLAR",
@@ -657,7 +657,7 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeExecutpe.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
                 ],
                 where: 
-                    {id_ome:[70, 72], //DASDH E PE
+                    {id_ome:[71], //DASDH E PE
                     mes,
                     ano,
                     operacao: "PJES PATRULHA ESCOLAR",
@@ -678,7 +678,7 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeDistPe.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
                     [SequelizeDistPe.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
                 ],
-                where: {idome:[70, 72], //DASDH E PE
+                where: {idome:[71], //DASDH E PE
                         mes,
                         ano,
                         operacao: "PJES PATRULHA ESCOLAR",
@@ -693,7 +693,7 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeExecutPe.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
                     [SequelizeExecutPe.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
                 ],
-                where: {id_ome:[70, 72], //DASDH E PE
+                where: {id_ome:[71], //DASDH E PE
                         mes,
                         ano,
                         operacao: "PJES PATRULHA ESCOLAR",
@@ -851,7 +851,10 @@ router.get('/', eAdmin, async (req, res) => {
                     [Sequelizeenem.literal('SUM(cotaprcdist) * 200'), 'total_cotaprcdist_multiplicado']
                 ],
                 where: 
-                    {idome:[1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], //DPO + OMES da DIM
+                    {idome:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                            21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                            41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                            61,62],
                     mes,
                     ano,
                     operacao: "PJES OP ENEM",
@@ -875,7 +878,10 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeExecutenem.literal('SUM(ttprcexe) * 200'), 'total_cotaprcexe_multiplicado']
                 ],
                 where: 
-                    {id_ome:[1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], //DPO + OMES da DIM
+                    {id_ome:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                            21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                            41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                            61,62],
                     mes,
                     ano,
                     operacao: "PJES OP ENEM",
@@ -896,7 +902,10 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeDistEnem.literal('SUM(cotaofdist) * 300'), 'valor_cotaofdist_multiplicado'],
                     [SequelizeDistEnem.literal('SUM(cotaprcdist) * 200'), 'valor_cotaprcdist_multiplicado']
                 ],
-                where: {idome:[1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+                where: {idome:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                                21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                                41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                                61,62],
                         mes,
                         ano,
                         operacao: "PJES OP ENEM",
@@ -911,7 +920,10 @@ router.get('/', eAdmin, async (req, res) => {
                     [SequelizeExecutEnem.literal('SUM(ttofexe) * 300'), 'valor_cotaofexe_multiplicado'],
                     [SequelizeExecutEnem.literal('SUM(ttprcexe) * 200'), 'valor_cotaprcexe_multiplicado']
                 ],
-                where: {id_ome:[1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], //DPO + OMES da DIM
+                where: {id_ome:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                                21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                                41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                                61,62],
                         mes,
                         ano,
                         operacao: "PJES OP ENEM",
@@ -946,10 +958,6 @@ router.get('/', eAdmin, async (req, res) => {
         //---ENEM | FIM CALCULAR OS VALORES E COTAS TOTAIS POR DIRETORIA-------------------------------------------------------------------------
 
 //---ENEM | FIM
-
-
-
-
 
 
     // INICIO -  CONSULTA PARA TRAZER O REMANESCENTE DE OFICIAIS ANUAL
@@ -993,7 +1001,6 @@ router.get('/', eAdmin, async (req, res) => {
     // FIM -  CONSULTA PARA TRAZER O REMANESCENTE DE PRAÇAS ANUAL
 
 
-
     // INICIO -  CONSULTA PARA TRAZER O TETO DE OFICIAIS E PRAÇAS DA TABELA tetopjes
     const ttgeralinicialofmes = await db.tetopjes.findOne({
         attributes: ['id', 'ctgeralinicialof', 'ctgeralinicialprc', 'mes', 'ano'],
@@ -1026,12 +1033,10 @@ router.get('/', eAdmin, async (req, res) => {
             const querypjes = await db.pjes.findAll({
                 attributes: ['idome', 'ano'],
                 where: {
-                    idome: [
-                        1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 2, 6, 7, 8, 9,
-                        10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                        30, 31, 32, 33, 4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-                        5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62
-                    ],
+                    idome: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                            21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                            41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                            61,62,65,66,67,68,69,70,71,72,73,74,75,76],
                     mes,
                     ano,
                     [Sequelize.Op.or]: [
@@ -1047,12 +1052,10 @@ router.get('/', eAdmin, async (req, res) => {
             const querypjesgercota = await db.pjesgercota.findAll({
                 attributes: ['id_ome', 'ano'],
                 where: {
-                    id_ome: [
-                        1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 2, 6, 7, 8, 9,
-                        10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                        30, 31, 32, 33, 4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-                        5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62
-                    ],
+                    id_ome: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                            21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                            41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                            61,62,65,66,67,68,69,70,71,72,73,74,75,76],
                     [Sequelize.Op.or]: [
                         { ttofexe: { [Sequelize.Op.gt]: 0 } },
                         { ttprcexe: { [Sequelize.Op.gt]: 0 } }
@@ -1106,12 +1109,12 @@ router.get('/', eAdmin, async (req, res) => {
     }
 
 
-    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS
     const nomeMesConvertido = converterMesPTparaEN(nomeMes);
     const ttServExcessoOf = await db.escalas.findAll({
         attributes: [
             'matricula',
-            [Sequelize.fn('COUNT', Sequelize.col('matricula')), 'count']
+            [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
         ],
         where: {
             data_inicio: {
@@ -1125,15 +1128,14 @@ router.get('/', eAdmin, async (req, res) => {
         group: ['matricula'],
         having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
     });
-    console.log('Registros encontrados para oficiais:', ttServExcessoOf.length);
     const ttServExcOf = ttServExcessoOf.length;
 
     
-    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE OFICIAS E PRAÇAS
+    // BLOCO QUE CONTA A QUANTIDADE SERVIÇO EM EXCESSO DE PRAÇAS
     const ttServExcessoPrc = await db.escalas.findAll({
         attributes: [
             'matricula',
-            [Sequelize.fn('COUNT', Sequelize.col('matricula')), 'count']
+            [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'count']
         ],
         where: {
             data_inicio: {
@@ -1147,7 +1149,7 @@ router.get('/', eAdmin, async (req, res) => {
         group: ['matricula'],
         having: Sequelize.literal('count > 12') // Condição para contar mais de 12 vezes
     });
-    console.log('Registros encontrados para praças:', ttServExcessoPrc.length);
+
     const ttServExcPrc = ttServExcessoPrc.length;
     const valorttServExc = (parseFloat(ttServExcOf) * 300) + (parseFloat(ttServExcPrc) * 200);
 
@@ -1207,7 +1209,7 @@ router.get('/', eAdmin, async (req, res) => {
             // Subconsulta para contar pg = 'ST' ou 'CB'
             [
                 Sequelize.literal(`(
-                    SELECT COUNT(*)
+                    SELECT SUM(ttcota)
                     FROM escalas 
                     WHERE escalas.idevento = pjes.id
                     AND (escalas.pg = 'ST' OR escalas.pg = '1º SGT'
@@ -1219,7 +1221,7 @@ router.get('/', eAdmin, async (req, res) => {
             // Subconsulta para contar pg = 'CEL' ou 'MAJ'
             [
                 Sequelize.literal(`(
-                    SELECT COUNT(*)
+                    SELECT SUM(ttcota)
                     FROM escalas 
                     WHERE escalas.idevento = pjes.id
                     AND (escalas.pg = 'CEL' OR escalas.pg = 'TC'
@@ -1238,21 +1240,13 @@ router.get('/', eAdmin, async (req, res) => {
             { model: db.omes, attributes: ['nome'] },
             { model: db.users, attributes: ['name'] }
         ],
-        offset: Number((page * limit) - limit),
-        limit: limit
-
     })
     .then((pjes) => {
+
         if (pjes.length !== 0) {
-            var pagination = {
-                path: '/pjes',
-                page,
-                prev_page_url: ((Number(page) - Number(1)) >= 1) ? Number(page) - Number(1) : false,
-                next_page_url: ((Number(page) + Number(1)) > Number(lastPage)) ? false : Number(page) + Number(1),
-                lastPage
-            }
+            
             res.render("admin/pjes/list", {
-                layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, pagination, sidebarSituations: true,
+                layout: 'main', profile: req.user.dataValues, user, nomeMes, nomeAno, sidebarSituations: true,
                 pjes: pjes.map(id => id.toJSON()),
 
                 valorFinalDistDpo, valorFinalExeDpo, saldoFinalDpo, total_cotadistdpo,
@@ -1374,7 +1368,7 @@ router.get('/view/:id', eAdmin, async (req, res) => {
                 Sequelize.literal(`'${nomeMesConvertido}'`),
                 'ttservMes'
             ],
-            [Sequelize.fn('COUNT', Sequelize.col('*')), 'totalRegistros']
+            [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'totalRegistros']
         ],
         where: Sequelize.literal(
             `
@@ -1397,13 +1391,13 @@ router.get('/view/:id', eAdmin, async (req, res) => {
         escala.dataValues.ttservMes = totalRegistrosPorMatricula[matricula] || 0;
     });
 
-    const cotaofexe = await db.escalas.count({
+    const cotaofexe = await db.escalas.sum('ttcota', {
         where: {
             idevento:id,
             pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL']
         }
     });
-    const cotaprcexe = await db.escalas.count({
+    const cotaprcexe = await db.escalas.sum('ttcota', {
         where: {
             idevento:id,
             pg: ['SD', 'CB', '3º SGT', '2º SGT', '1º SGT', 'ST']
@@ -1451,16 +1445,17 @@ router.get('/add', eAdmin, async (req, res) => {
         attributes: ['id', 'nome'],
         where: {
             id: {
-                [Op.in]: [2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                    4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                    62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73
-                ]
+                [Op.in]: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                        21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                        41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                        61,62,65,66,67,68,69,70,71,72,73,74,75,76]
             }
         },
         order: [
-            [Sequelize.literal(`FIELD(id, ${[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73].join(',')})`)],
+            [Sequelize.literal(`FIELD(id, ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                61,62,65,66,67,68,69,70,71,72,73,74,75,76].join(',')})`)],
         ]
     });
 
@@ -1474,7 +1469,8 @@ router.get('/add', eAdmin, async (req, res) => {
 
 });
 
-// TELA QUE ADCIONA (CREATE) O EVENTO PJES
+
+/*// TELA QUE ADCIONA (CREATE) O EVENTO PJES
 router.post('/add', eAdmin, async (req, res) => {
 
     const nomeMes = req.session.mes;
@@ -1482,6 +1478,7 @@ router.post('/add', eAdmin, async (req, res) => {
     
     // Receber os dados do formulário
     var data = req.body;
+
 
     if (data.idome === '1') {
         data.iddiretoria = '1';
@@ -1693,6 +1690,73 @@ router.post('/add', eAdmin, async (req, res) => {
     });
 
 });
+*/
+
+// TELA QUE ADCIONA (CREATE) O EVENTO PJES
+router.post('/add', eAdmin, async (req, res) => {
+    const nomeMes = req.session.mes;
+    const nomeAno = req.session.ano;
+    
+    // Receber os dados do formulário
+    var data = req.body;
+
+    // Mapeamento para iddiretoria
+    const iddiretoriaMap = {
+        '1': '1', '2': '2', '3': '3', '4': '4', '5': '5',
+        '6': '2', '7': '2', '8': '2', '9': '2', '10': '2',
+        '11': '2', '12': '2', '13': '2', '14': '2', '15': '2',
+        '16': '2', '17': '2', '18': '2', '19': '2', '20': '3',
+        '21': '3', '22': '3', '23': '3', '24': '3', '25': '3',
+        '26': '3', '27': '3', '28': '3', '29': '3', '30': '3',
+        '31': '3', '32': '3', '33': '3', '34': '3', '35': '3',
+        '36': '4', '37': '4', '38': '4', '39': '4', '40': '4',
+        '41': '4', '42': '4', '43': '4', '44': '4', '45': '4',
+        '46': '4', '47': '4', '48': '4', '49': '4', '50': '4',
+        '51': '4', '52': '5', '53': '5', '54': '5', '55': '5',
+        '56': '5', '57': '5', '58': '5', '59': '5', '60': '5',
+        '61': '5', '62': '5', '63': '5', '64': '5', '65': '1',
+        '66': '1', '67': '1', '68': '1', '69': '1', '70': '1',
+        '71': '1', '72': '1', '73': '1', '74': '1', '75': '1',
+        '76': '1', '77': '1', '78': '1', '79': '1', '80': '1'
+    };
+
+    // Mapeamento para cod
+    const codMap = {
+        'PJES GOVERNO REGULAR': '247',
+        'PJES CTM (BRT)': '255',
+        'PJES PATULHA ESCOLAR': '263',
+        'PJES OP ENEM': '250'
+    };
+
+    // Definindo iddiretoria e cod com base no mapeamento
+    data.iddiretoria = iddiretoriaMap[data.idome] || null;
+    data.cod = codMap[data.operacao] || null;
+
+    // Validar os campos utilizando o yup
+    const schema = yup.object().shape({
+        evento: yup.string("Erro: Necessário preencher o evento!")
+            .required("Erro: Necessário preencher o campo nome!")
+    });
+
+    // Verificar se todos os campos passaram pela validação
+    try {
+        await schema.validate(data);
+    } catch (error) {
+        // Pausar o processamento e carregar a view enviando os dados que o usuário havia preenchido no formulário
+        return res.render("admin/pjes/add", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, data, danger_msg: error.errors });
+    }
+
+    // Cadastrar no banco de dados
+    db.pjes.create(data).then(() => {
+        // Criar a mensagem de situação cadastrado com sucesso, e-mail enviado
+        req.flash("success_msg", "Evento cadastrado!");
+        res.redirect(`/pjes?mes=${nomeMes}&ano=${nomeAno}`);
+    }).catch(() => {
+        // Pausar o processamento e carregar a view enviando os dados que o usuário havia preenchido no formulário
+        return res.render("admin/pjes/add", { layout: 'main', profile: req.user.dataValues, sidebarSituations: true, data: req.body, danger_msg: "Erro: Pjes não cadastrado com sucesso!" });
+    });
+});
+
 
 // TELA QUE VISUALIZA O FORM DA EDIÇÃO DO EVENTO
 router.get('/edit/:id', eAdmin, async (req, res) => {
@@ -1729,16 +1793,17 @@ router.get('/edit/:id', eAdmin, async (req, res) => {
             attributes: ['id', 'nome'],
             where: {
                 id: {
-                    [Op.in]: [2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                        4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                        62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73
-                    ]
+                    [Op.in]: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                            21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                            41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                            61,62,65,66,67,68,69,70,71,72,73,74,75,76]
                 }
             },
             order: [
-                [Sequelize.literal(`FIELD(id, ${[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                    4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                    62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73].join(',')})`)],
+                [Sequelize.literal(`FIELD(id, ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                    21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                    41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                    61,62,65,66,67,68,69,70,71,72,73,74,75,76].join(',')})`)],
             ]
         });
 
@@ -1819,8 +1884,13 @@ moment.locale('pt-br');
 router.post('/escalas/:id', eAdmin, async (req, res) => {
     const nomeMes = req.session.mes;
 
-    // Receber os dados do formulário
-    const { data_inicio, ...dataFormulario } = req.body;
+    const { data_inicio, hora_inicio, hora_fim, data_fim, ...dataFormulario } = req.body;
+
+    // Adicionar `hora_inicio`, `hora_fim`, e `data_fim` ao `dataFormulario`
+    dataFormulario.hora_inicio = hora_inicio;
+    dataFormulario.hora_fim = hora_fim;
+    dataFormulario.data_fim = data_fim;
+
 
     // Validar os campos utilizando o yup   
     const schema = yup.object().shape({
@@ -1840,34 +1910,50 @@ router.post('/escalas/:id', eAdmin, async (req, res) => {
     });
 
 
-    if (dataFormulario.operacao === 'PJES GOVERNO REGULAR') {
-        dataFormulario.cod = 247;
-    } else if (dataFormulario.operacao === 'PJES CTM (BRT)') {
-        dataFormulario.cod = 255;
-    } else if (dataFormulario.operacao === 'PJES PATRULHA ESCOLAR') {
-        dataFormulario.cod = 263;
-    } else if (dataFormulario.operacao === 'PJES GOVERNO REMANESCENTE') {
-        dataFormulario.cod = 248;
-    } else if (dataFormulario.operacao === 'PJES OPER CONVIVÊNCIA') {
-        dataFormulario.cod = 249;
-    } else if (dataFormulario.operacao === 'PJES GOVERNO OP ENEM') {
-        dataFormulario.cod = 250;
-    } else if (dataFormulario.operacao === 'PJES ALEPE') {
-        dataFormulario.cod = 251;
-    } else if (dataFormulario.operacao === 'PJES TJPE') {
-        dataFormulario.cod = 252;
-    } else if (dataFormulario.operacao === 'PJES MPPE') {
-        dataFormulario.cod = 253;
-    } else if (dataFormulario.operacao === 'PJES PREFEITURA DE RECIFE') {
-        dataFormulario.cod = 254;
-    } else if (dataFormulario.operacao === 'PJES CBTU') {
-        dataFormulario.cod = 256;
-    } else if (dataFormulario.operacao === 'PJES CPRH') {
-        dataFormulario.cod = 257;
-    } else if (dataFormulario.operacao === 'PJES SEMOC PCR') {
-        dataFormulario.cod = 265;
-    }else {
-        // Defina um valor padrão ou tratamento para outros casos, se necessário
+    // Mapear o código para operação
+    const operationCodes = {
+        'PJES GOVERNO REGULAR': 247,
+        'PJES CTM (BRT)': 255,
+        'PJES PATRULHA ESCOLAR': 263,
+        'PJES GOVERNO REMANESCENTE': 248,
+        'PJES OPER CONVIVÊNCIA': 249,
+        'PJES GOVERNO OP ENEM': 250,
+        'PJES ALEPE': 251,
+        'PJES TJPE': 252,
+        'PJES MPPE': 253,
+        'PJES PREFEITURA DE RECIFE': 254,
+        'PJES CBTU': 256,
+        'PJES CPRH': 257,
+        'PJES SEMOC PCR': 265
+    };
+    
+    dataFormulario.cod = operationCodes[dataFormulario.operacao] || null;
+
+    if (!escalas) {
+        return res.status(404).send('Evento não encontrado.');
+    }
+
+    // Calcular a data limite para cadastro (60 dias após a criação do evento)
+    const dataLimiteCadastro = moment(escalas.createdAt).add(60, 'days');
+    const dataInicioMoment = moment(data_inicio, 'YYYY-MM-DD');
+
+    // Verificar se a data de início está dentro do período permitido
+    if (dataInicioMoment.isAfter(dataLimiteCadastro)) {
+        return res.redirect('/admin/pjes/view/' + escalas.id);
+    }
+
+    // Calcular a diferença total entre data_inicio + hora_inicio e data_fim + hora_fim
+    const dataInicioHoraMoment = moment(`${data_inicio} ${hora_inicio}`, 'YYYY-MM-DD HH:mm');
+    const dataFimHoraMoment = moment(`${data_fim} ${hora_fim}`, 'YYYY-MM-DD HH:mm');
+
+    // Calcular a duração total em horas
+    const duracaoHoras = dataFimHoraMoment.diff(dataInicioHoraMoment, 'hours', true);
+
+    // Definir o valor de ttcota baseado na hora_inicio e hora_fim
+    if (hora_inicio === hora_fim) {
+        dataFormulario.ttcota = 2;
+    } else {
+        dataFormulario.ttcota = 1;
     }
 
 
@@ -1875,7 +1961,14 @@ router.post('/escalas/:id', eAdmin, async (req, res) => {
     try {
         await schema.validate(dataFormulario);
     } catch (error) {
-        return res.render("admin/pjes/list", { layout: 'main', profile: req.user.dataValues, nomeMes, sidebarSituations: true, data: { ...dataFormulario, data_inicio }, danger_msg: error.errors });
+        return res.render('/admin/pjes/view/' + escalas.id, { 
+            layout: 'main', 
+            profile: req.user.dataValues, 
+            nomeMes, 
+            sidebarSituations: true, 
+            data: { ...dataFormulario, data_inicio }, 
+            danger_msg: error.errors 
+        });
     }
 
 
@@ -1883,27 +1976,41 @@ router.post('/escalas/:id', eAdmin, async (req, res) => {
     const ttLimitctof = await db.pjes.sum('cotaofdist', {where: {id: req.params.id,}});
 
     //CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS EXECUTADAS POR EVENTO
-    const cotaofexe = await db.escalas.count({where: { idevento: req.params.id, pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'] }});
-
-    //NÃO PERMITIR SALVAR SE O VALOR EXECUTADO DE COTAS DE OFICIAIS FOR MAIOR DO QUE O DISTRIBUIDO
-    if (cotaofexe >= ttLimitctof) {
-        req.flash("danger_msg", "Atenção. Limite de Cotas de Oficiais foi atingido. ");
-        res.redirect('/pjes/view/' + escalas.id);
-        return;
-    }
+    const cotaofexe = await db.escalas.sum('ttcota', {where: { idevento: req.params.id, pg: ['2º TEN', '1º TEN', 'CAP', 'MAJ', 'TC', 'CEL'] }});
 
     //CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS DISTRIBUIDA POR EVENTO
     const ttLimitctprc = await db.pjes.sum('cotaprcdist', {where: {id: req.params.id,}});
 
     //CONSULTA PARA VERIFICAR O LIMITE DE COTA DE OFICIAIS EXECUTADAS POR EVENTO
-    const cotaprcexe = await db.escalas.count({where: { idevento: req.params.id, pg: ['ST', '1º SGT', '2º SGT', '3º SGT', 'CB', 'SD'] }});
+    const cotaprcexe = await db.escalas.sum('ttcota', {where: { idevento: req.params.id, pg: ['ST', '1º SGT', '2º SGT', '3º SGT', 'CB', 'SD'] }});
 
-    //NÃO PERMITIR SALVAR SE O VALOR EXECUTADO DE COTAS DAS PRAÇAS FOR MAIOR DO QUE O DISTRIBUIDO
-    if (cotaprcexe >= ttLimitctprc) {
-        req.flash("danger_msg", "Atenção. Limite de Cotas das Praças foi atingido. ");
-        res.redirect('/pjes/view/' + escalas.id);
-        return;
+    //NÃO PERMITIR SALVAR SE O VALOR EXECUTADO DE COTAS DE OFICIAIS FOR MAIOR DO QUE O DISTRIBUIDO
+    let errorMessage = "";
+
+    if (dataFormulario.pg === 'CEL' || dataFormulario.pg === 'TC' ||
+        dataFormulario.pg === 'MAJ' || dataFormulario.pg === 'CAP' ||
+        dataFormulario.pg === '1º TEN' || dataFormulario.pg === '2º TEN' ||
+        dataFormulario.pg === 'ASP') {
+        if (dataFormulario.ttcota + cotaofexe > ttLimitctof) {
+            console.log("Limite de Cotas das oficiais atingido");
+            errorMessage += "Atenção. Limite de Cotas de Oficiais foi atingido. ";
+        }
     }
+
+    if (dataFormulario.pg === 'ST' || dataFormulario.pg === '1º SGT' ||
+        dataFormulario.pg === '2º SGT' || dataFormulario.pg === '3º SGT' ||
+        dataFormulario.pg === 'CB' || dataFormulario.pg === 'SD') {
+        if (dataFormulario.ttcota + cotaprcexe > ttLimitctprc) {
+            console.log("Limite de Cotas das Praças foi atingido");
+            errorMessage += "Atenção. Limite de Cotas de Praças foi atingido. ";
+        }
+    }
+
+    if (errorMessage) {
+        req.flash("danger_msg", errorMessage);
+        return res.redirect('/pjes/view/' + req.params.id);
+    }
+
 
     // Extrair o mês do campo data_inicio e converter para o formato abreviado em português (FEV, MAR, etc.)
     const mesSelecionado = moment(data_inicio, 'YYYY-MM-DD').format('MMM').toUpperCase();
@@ -2077,26 +2184,83 @@ router.get('/deleteEscala/:id', async (req, res) => {
 
 //SQL para buscar os dados do PM na tabela SGPM e retornar para o AJAX
 let dadosSgpms = {};
+
+const { Op } = require('sequelize'); 
 router.get('/buscarSgpm/:matricula', async (req, res) => {
     const matricula = req.params.matricula;
+    const nomeMes = req.session.mes;
+    const nomeAno = req.session.ano;
 
     try {
+        // Obtendo dados do sgpm
         const dadoSgpm = await db.sgpms.findOne({
             where: { matricula: matricula },
-            attributes: ['id', 'pg', 'nome', 'ome', 'status', 'nunfunc','localap', 'createdAt', 'updatedAt']
+            attributes: ['id', 'pg', 'nome', 'ome', 'status', 'nunfunc', 'localap', 'createdAt', 'updatedAt']
         });
+
+        function converterMesPTparaEN(nomeMesPT) {
+            switch (nomeMesPT) {
+                case 'JAN': return 'JAN';
+                case 'FEV': return 'FEB';
+                case 'MAR': return 'MAR';
+                case 'ABR': return 'APR';
+                case 'MAI': return 'MAY';
+                case 'JUN': return 'JUN';
+                case 'JUL': return 'JUL';
+                case 'AGO': return 'AUG';
+                case 'SET': return 'SEP';
+                case 'OUT': return 'OCT';
+                case 'NOV': return 'NOV';
+                case 'DEZ': return 'DEC';
+                default: return nomeMesPT;
+            }
+        }
+
+        const nomeMesConvertido = converterMesPTparaEN(nomeMes);
+
+        // Obtendo os serviços detalhados
+        const ttservico = await db.escalas.findAll({
+            attributes: [
+                'matricula',
+                'idome',
+                [Sequelize.fn('DATE_FORMAT', Sequelize.col('data_inicio'), '%d'), 'dia'],
+                [Sequelize.fn('SUM', Sequelize.col('ttcota')), 'total_servicos']
+            ],
+            where: {
+                data_inicio: {
+                    [Op.and]: [
+                        Sequelize.literal(`DATE_FORMAT(data_inicio, '%b') = '${nomeMesConvertido}'`),
+                        Sequelize.literal(`YEAR(data_inicio) = ${nomeAno}`)
+                    ]
+                },
+                matricula: matricula
+            },
+            include: [
+                { model: db.omes, attributes: ['nome'] },
+            ],
+            group: ['matricula', 'idome', 'dia'],
+            raw: true // Adicionando raw: true para obter o resultado como um objeto simples
+        });
+
+        // Processar o resultado para incluir o nome do OME e outras informações
+        const servicosDetalhados = ttservico.map(item => ({
+            dia: item.dia,
+            nome: item['ome.nome'], // Usar a notação de colchetes para acessar o atributo aninhado
+            total_servicos: item.total_servicos
+        }));
 
         if (dadoSgpm) {
             // Preenche o objeto dadosSgpms com os dados encontrados no banco de dados
-            dadosSgpms[matricula] = {
+            const dadosSgpms = {
                 pg: dadoSgpm.pg,
                 nome: dadoSgpm.nome,
                 ome: dadoSgpm.ome,
                 status: dadoSgpm.status,
                 nunfunc: dadoSgpm.nunfunc,
-                localap: dadoSgpm.localap    
+                localap: dadoSgpm.localap,
+                servicosDetalhados: servicosDetalhados // Adiciona o array de serviços detalhados ao objeto
             };
-            res.json(dadoSgpm); // Retorna o dadoSgpm encontrado como JSON (opcional)
+            res.json(dadosSgpms); // Retorna o objeto dadosSgpms como JSON
         } else {
             res.status(404).send('dadoSgpm não encontrado');
         }
@@ -2105,7 +2269,6 @@ router.get('/buscarSgpm/:matricula', async (req, res) => {
         res.status(500).send('Erro interno ao buscar dadoSgpm');
     }
 });
-
 
 
 router.get('/gerar-arquivo-xls', eAdmin, async (req, res) => {    
@@ -2334,9 +2497,6 @@ router.get('/gerar-arquivo-xls', eAdmin, async (req, res) => {
     }
     
 });
-
-
-
 
 
 // Exportar a instrução que está dentro da constante router 

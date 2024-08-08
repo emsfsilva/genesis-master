@@ -1,3 +1,42 @@
+<!-- FullCalendar CSS -->
+<link href='https://unpkg.com/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/fullcalendar@5.11.3/list.min.css' rel='stylesheet' />
+
+<!-- FullCalendar JS -->
+<script src='https://unpkg.com/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://unpkg.com/fullcalendar@5.11.3/list.min.js'></script>
+<script src='https://unpkg.com/fullcalendar@5.11.3/locales/pt-br.js'></script> <!-- Script para o locale pt-BR -->
+
+<style>
+  /* Estilo para o título do calendário */
+  .fc-toolbar-title {
+      font-size: 10px; /* Tamanho da fonte do título */
+  }
+
+  /* Estilo para os eventos */
+  .fc-event {
+      background-color: #378006; /* Cor de fundo dos eventos */
+      color: white; /* Cor do texto dos eventos */
+      font-size: 8px; /* Tamanho da fonte dos eventos */
+  }
+
+  .watermark {
+  position: absolute; /* Permite o posicionamento da marca d'água */
+  top: 50%; /* Centraliza verticalmente */
+  left: 50%; /* Centraliza horizontalmente */
+  transform: translate(-50%, -50%); /* Ajusta a posição da imagem para que ela fique realmente centralizada */
+  opacity: 0.1; /* Ajusta a transparência da marca d'água */
+  pointer-events: none; /* Faz com que a imagem não interfira com cliques e outras interações */
+}
+
+.watermark img {
+  width: 400px; /* Define a largura específica da imagem */
+  height: 400px; /* Define a altura específica da imagem */
+}
+
+</style>
+
+
 <!-- page content -->
 <div class="right_col" role="main">
   <div class="">
@@ -7,8 +46,7 @@
         <div class="x_panel">
           <div class="x_title">
             <h2>Usuario</h2>
-            <ul class="nav navbar-right panel_toolbox">
-              
+            <ul class="nav navbar-right panel_toolbox"> 
               <li><a href="/unidade/unidadeprofile/edit"><i class="fa fa-edit text-warning"></i></a></li>
               <li><a href="/unidade/unidadeprofile/edit-password"><i class="fa fa-key text-success"></i></a></li>
               <li><a href="/unidade/unidadeprofile/edit-image"><i class="fa fa-image text-primary"></i></a></li>
@@ -16,116 +54,294 @@
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
-              {{>_msgAdm}}
-              <div class="col-md-2 col-sm-2  profile_left">
-                <div class="profile_img">
+            {{>_msgAdm}}
+
+            <div class="col-md-3 col-sm-3  profile_left">
+              <div class="profile_img">
                   <div id="crop-avatar">
-                    {{#if user.dataValues.image}}
-                    <img class="img-responsive avatar-view" src="/images/users/{{user.dataValues.image}}" width="150px"
-                      height="150px" alt="Avatar" title="Change the avatar">
-                    {{else}}
-                    <img class="img-responsive avatar-view" src="/images/users/user.jpg" width="150px" height="150px"
+                  <!-- Current avatar -->
+                  {{#if profile.image}}
+                      <img class="img-responsive avatar-view" src="/images/users/{{profile.image}}" width="150px"
+                  height="150px" alt="Avatar" title="Change the avatar">
+                  {{else}}
+                      <img class="img-responsive avatar-view" src="/images/users/user.jpg" width="150px" height="150px"
                       alt="Avatar" title="Change the avatar">
-                    {{/if}}
+                  {{/if}}
                   </div>
-                </div>
+              </div>
+              <h3>{{profile.name}}</h3>
+              <ul class="list-unstyled user_data">
+                  <li><i class="fa fa-university user-profile-icon"></i> {{profile.ome.dataValues.nome}}
+                      <ul><i class="fa fa-hand-o-right user-profile-icon"></i> {{profile.PcontasOme.dataValues.nome}}</ul>
+                  </li>
+                  <li><i class="fa fa-barcode user-profile-icon"></i> {{profile.matricula}}</li>
+                  <li><i class="fa fa-user user-profile-icon"></i> {{profile.loginsei}}</li>
+                  <li><i class="fa fa-phone user-profile-icon"></i> {{profile.telefone}}</li>
+                  <li class="m-top-xs"><i class="fa fa-at user-profile-icon"></i><a>{{profile.email}}</a></li>
+              </ul>
+                  <a class="btn btn-success" style="color: #ffffff;"><i class="fa fa-user m-right-xs"></i> Situação: {{profile.situation.dataValues.nameSituation}}</a>
+              <br />
+            </div>
+
+            <div class="col-md-9 col-sm-9 ">
+
+              <div class="x_title">
+                <h2>Escala de Serviço</h2>
+                  <div class="clearfix"></div>
               </div>
 
-              <div class="col-md-10 col-sm-10 ">
-                <!-- start recent activity -->
-                      <div class="col-md-12 ">
-                        <div class="x_panel">
-                          <div class="x_title">
-                            <h2><small>Informações Basicas</small></h2>
+              <!-- start of user-activity-graph -->
+              <div id="myCustomCalendar" style="width:100%; height:100%;"></div></br></br>
+              <script id="data" type="application/json">{{{eventosFullCalendar}}}</script>
+              <script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                      var eventosJson = document.getElementById('data').textContent;
+                      console.log('Conteúdo da tag <script>:', eventosJson);
+                      try {
+                          var eventos = JSON.parse(eventosJson);
+                          console.log('Eventos do servidor:', eventos);
+                          var calendarEl = document.getElementById('myCustomCalendar');
 
-                            <div class="clearfix"></div>
+                          var calendar = new FullCalendar.Calendar(calendarEl, {
+                              initialView: 'dayGridMonth',
+                              locales: ['pt-br'],
+                              locale: 'pt-br',
+                              events: eventos,
+                              eventColor: '#378006',
+                              eventClick: function(info) {
+                                  // Atualiza o conteúdo do modal com os dados do evento
+                                  document.getElementById('title2').value = info.event.title;
+                                  document.getElementById('descr2').value = info.event.extendedProps.description;
+                                  
+                                  // Exibe o modal
+                                  $('#CalenderModalDetalhes').modal('show');
+                              },
+                              headerToolbar: {left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth'},
+                              views: {dayGridMonth: {displayEventTime: false} },
+                              listMonth: {buttonText: 'Lista do Mês'}
+                          });
+
+                          calendar.render();
+                      } catch (e) {
+                          console.error('Erro ao analisar o JSON dos eventos:', e);
+                      }
+                  });
+              </script>
+              <!-- end of user-activity-graph -->
+
+              <!-- /calendar modal -->
+              <div id="CalenderModalDetalhes" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="x_panel col-md-12 col-sm-12">
+
+                      <div class="modal-content">
+
+                        <div class="x_title">
+                          <h2>Escala</h2>
+                          <ul class="nav navbar-right panel_toolbox"> 
+                            <li><a href=""><i class="fa fa-mail-forward text-warning"> Permuta</i></a></li>
+                            <li><a href=""><i class="fa fa-trash text-danger"> Cancelar</i></a></li>
+                            <li><a href=""><i class="fa fa-book text-success"> Relatorio</i></a></li>
+                            <li><a href=""><i class="fa fa-info text-primary"> Inf Erro</i></a></li>
+                          </ul>
+                        </div>
+                          
+                          <div style="background: rgb(255, 255, 255);" class="modal-body">
+
+                            <div class="watermark">
+                              <img src="/images/logo/logo_dpo_ppt_oficial.png" alt="Marca d'água">
+                              </div>
+                              <div id="testmodal2" style="padding: 5px 20px;">
+                                  <form id="antoform2" class="form-horizontal calender" role="form">
+                                      <div class="form-group">
+                                          <div class="col-sm-12">
+                                            <label class="control-label">Operação</label>
+                                              <input type="text" style="font-size:11px; background:transparent;" class="form-control" id="title2" name="title2">
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          
+                                          <div class="col-sm-12">
+                                            <label class="control-label">Informações</label>
+                                              <textarea class="form-control" style="height:500px; background:transparent; font-size:11px;" id="descr2" name="descr"></textarea>
+                                          </div>
+                                      </div>
+                                  </form>
+                              </div>
+                              <button type="button" class="btn btn-primary antoclose2" data-dismiss="modal">Fechar</button>
                           </div>
-                          <div class="x_content">
-                            <br />
-                            <form class="form-horizontal form-label-left">
-                              <div class="form-group row ">
-                                <label class="control-label col-md-3 col-sm-3 ">Nome</label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a>{{user.dataValues.name}}</a>
-                                  </label>
-                                </div>
-                              </div>
-                              <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 ">Email </label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a>{{user.dataValues.email}}</a>
-                                  </label>
-                                </div>
-                              </div>
-                              <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 "> Situação</label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a href="/situations/view/{{user.dataValues.situationId}}">
-                                      {{user.situation.dataValues.nameSituation}}
-                                    </a>
-                                  </label>
-                                </div>
-                              </div>
+                          
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <!-- /calendar modal -->
 
-                              <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 "> OME</label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a href="/situations/view/{{user.dataValues.omeId}}">
-                                      {{user.ome.dataValues.nome}}
-                                    </a>
-                                  </label>
-                                </div>
-                              </div>
 
-                              <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 ">Login SEI </label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a>{{user.dataValues.loginsei}}</a>
-                                  </label>
-                                </div>
-                              </div>
 
-                              <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 ">Telefone </label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a>{{user.dataValues.telefone}}</a>
-                                  </label>
-                                </div>
-                              </div>
 
-                              <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 "> Credencial</label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a>{{user.PcontasOme.dataValues.nome}}</a>
-                                  </label>
-                                </div>
-                              </div>
 
-                              <div class="form-group row">
-                                <label class="control-label col-md-3 col-sm-3 ">Data do Cadastro </label>
-                                <div class="col-md-9 col-sm-9 ">
-                                  <label class="control-label">
-                                    <a>{{#formatDateTime user.dataValues.createdAt}}{{/formatDateTime}}</a>
-                                  </label>
-                                </div>
-                              </div>
 
-                              <div class="ln_solid"></div>
-                            </form>
+
+
+
+
+
+
+                      <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                          <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Recent Activity</a>
+                            </li>
+                            <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Projects Worked on</a>
+                            </li>
+                            <li role="presentation" class=""><a href="#tab_content3" role="tab" id="profile-tab2" data-toggle="tab" aria-expanded="false">Profile</a>
+                            </li>
+                          </ul>
+                        <div id="myTabContent" class="tab-content">
+                          <div role="tabpanel" class="tab-pane active " id="tab_content1" aria-labelledby="home-tab">
+
+                            <!-- start recent activity -->
+                            <ul class="messages">
+                              <li>
+                                <img src="images/img.jpg" class="avatar" alt="Avatar">
+                                <div class="message_date">
+                                  <h3 class="date text-info">24</h3>
+                                  <p class="month">May</p>
+                                </div>
+                                <div class="message_wrapper">
+                                  <h4 class="heading">Desmond Davison</h4>
+                                  <blockquote class="message">Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua butcher retro keffiyeh dreamcatcher synth.</blockquote>
+                                  <br />
+                                  <p class="url">
+                                    <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
+                                    <a href="#"><i class="fa fa-paperclip"></i> User Acceptance Test.doc </a>
+                                  </p>
+                                </div>
+                              </li>
+                              <li>
+                                <img src="images/img.jpg" class="avatar" alt="Avatar">
+                                <div class="message_date">
+                                  <h3 class="date text-error">21</h3>
+                                  <p class="month">May</p>
+                                </div>
+                                <div class="message_wrapper">
+                                  <h4 class="heading">Brian Michaels</h4>
+                                  <blockquote class="message">Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua butcher retro keffiyeh dreamcatcher synth.</blockquote>
+                                  <br />
+                                  <p class="url">
+                                    <span class="fs1" aria-hidden="true" data-icon=""></span>
+                                    <a href="#" data-original-title="">Download</a>
+                                  </p>
+                                </div>
+                              </li>
+                              <li>
+                                <img src="images/img.jpg" class="avatar" alt="Avatar">
+                                <div class="message_date">
+                                  <h3 class="date text-info">24</h3>
+                                  <p class="month">May</p>
+                                </div>
+                                <div class="message_wrapper">
+                                  <h4 class="heading">Desmond Davison</h4>
+                                  <blockquote class="message">Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua butcher retro keffiyeh dreamcatcher synth.</blockquote>
+                                  <br />
+                                  <p class="url">
+                                    <span class="fs1 text-info" aria-hidden="true" data-icon=""></span>
+                                    <a href="#"><i class="fa fa-paperclip"></i> User Acceptance Test.doc </a>
+                                  </p>
+                                </div>
+                              </li>
+                              <li>
+                                <img src="images/img.jpg" class="avatar" alt="Avatar">
+                                <div class="message_date">
+                                  <h3 class="date text-error">21</h3>
+                                  <p class="month">May</p>
+                                </div>
+                                <div class="message_wrapper">
+                                  <h4 class="heading">Brian Michaels</h4>
+                                  <blockquote class="message">Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua butcher retro keffiyeh dreamcatcher synth.</blockquote>
+                                  <br />
+                                  <p class="url">
+                                    <span class="fs1" aria-hidden="true" data-icon=""></span>
+                                    <a href="#" data-original-title="">Download</a>
+                                  </p>
+                                </div>
+                              </li>
+
+                            </ul>
+                            <!-- end recent activity -->
+
+                          </div>
+                          <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+
+                            <!-- start user projects -->
+                            <table class="data table table-striped no-margin">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Project Name</th>
+                                  <th>Client Company</th>
+                                  <th class="hidden-phone">Hours Spent</th>
+                                  <th>Contribution</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>1</td>
+                                  <td>New Company Takeover Review</td>
+                                  <td>Deveint Inc</td>
+                                  <td class="hidden-phone">18</td>
+                                  <td class="vertical-align-mid">
+                                    <div class="progress">
+                                      <div class="progress-bar progress-bar-success" data-transitiongoal="35"></div>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>2</td>
+                                  <td>New Partner Contracts Consultanci</td>
+                                  <td>Deveint Inc</td>
+                                  <td class="hidden-phone">13</td>
+                                  <td class="vertical-align-mid">
+                                    <div class="progress">
+                                      <div class="progress-bar progress-bar-danger" data-transitiongoal="15"></div>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>3</td>
+                                  <td>Partners and Inverstors report</td>
+                                  <td>Deveint Inc</td>
+                                  <td class="hidden-phone">30</td>
+                                  <td class="vertical-align-mid">
+                                    <div class="progress">
+                                      <div class="progress-bar progress-bar-success" data-transitiongoal="45"></div>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td>4</td>
+                                  <td>New Company Takeover Review</td>
+                                  <td>Deveint Inc</td>
+                                  <td class="hidden-phone">28</td>
+                                  <td class="vertical-align-mid">
+                                    <div class="progress">
+                                      <div class="progress-bar progress-bar-success" data-transitiongoal="75"></div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <!-- end user projects -->
+
+                          </div>
+                          <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
+                            <p>xxFood truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui
+                              photo booth letterpress, commodo enim craft beer mlkshk </p>
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      <!-- end recent activity -->
-                
-              </div>
           </div>
         </div>
       </div>
@@ -133,3 +349,4 @@
   </div>
 </div>
 <!-- /page content -->
+

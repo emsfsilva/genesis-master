@@ -45,7 +45,7 @@ router.get('/', eAdmin, async (req, res) => {
             [Sequelize.literal('SUM(cotadist) * 180'),'total_cotadist_multiplicado']
         ],
         where: {
-            idome: [1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+            idome: [1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
             mes,
             ano,
         },
@@ -67,7 +67,7 @@ router.get('/', eAdmin, async (req, res) => {
             [Sequelize.literal('SUM(ttexe) * 180'), 'total_cotaexe_multiplicado'],    
         ],
         where: 
-            {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+            {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
             mes,
             ano,
         },
@@ -85,7 +85,7 @@ router.get('/', eAdmin, async (req, res) => {
         attributes: [
             [Sequelize.literal('SUM(cotadist) * 180'), 'valor_cotadist_multiplicado'],
         ],
-        where: {idome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+        where: {idome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
                 mes,
                 ano,
         },
@@ -97,7 +97,7 @@ router.get('/', eAdmin, async (req, res) => {
         attributes: [
             [Sequelize.literal('SUM(ttexe) * 180'), 'valor_cotaexe_multiplicado'],
         ],
-        where: {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73],
+        where: {id_ome:[1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76],
                 mes,
                 ano,
         },
@@ -603,12 +603,10 @@ router.get('/', eAdmin, async (req, res) => {
                 'idome', 'ano',
                 ],
                 where: {
-                idome: [
-                    1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 2, 6, 7, 8, 9,
-                    10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                    30, 31, 32, 33, 4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-                    5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62
-                ],
+                idome: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                        21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                        41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                        61,62,65,66,67,68,69,70,71,72,73,74,75,76],
                 mes,
                 ano,
                 [Sequelize.Op.or]: [
@@ -625,12 +623,11 @@ router.get('/', eAdmin, async (req, res) => {
                 'id_ome', 'ano',
                 ],
                 where: {
-                id_ome: [
-                    1, 65, 66, 67, 68, 69, 70, 71, 72, 73, 2, 6, 7, 8, 9,
-                    10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                    30, 31, 32, 33, 4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-                    5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62
-                ],
+                    idome: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                            21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                            41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                            61,62,65,66,67,68,69,70,71,72,73,74,75,76],
+
                 [Sequelize.Op.or]: [
                     { ttexe: { [Sequelize.Op.gt]: 0 } },
                 ],
@@ -762,16 +759,18 @@ router.get('/add', eAdmin, async (req, res) => {
         attributes: ['id', 'nome'],
         where: {
             id: {
-                [Op.in]: [2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                    4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                    62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73
+                [Op.in]: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                        21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                        41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                        61,62,65,66,67,68,69,70,71,72,73,74,75,76
                 ]
             }
         },
         order: [
-            [Sequelize.literal(`FIELD(id, ${[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73].join(',')})`)],
+            [Sequelize.literal(`FIELD(id, ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                61,62,65,66,67,68,69,70,71,72,73,74,75,76].join(',')})`)],
         ]
     });
 
@@ -799,169 +798,28 @@ router.post('/add', eAdmin, async (req, res) => {
     const nomeAno = req.session.ano;
     var data = req.body;
 
-    if (data.idome === '1') {
-        data.iddiretoria = '1';
-    } else if (data.idome === '2') {
-        data.iddiretoria = '2';
-    } else if (data.idome === '3') {
-        data.iddiretoria = '3';
-    } else if (data.idome === '4') {
-        data.iddiretoria = '4';
-    } else if (data.idome === '5') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '6') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '7') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '8') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '9') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '10') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '11') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '12') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '13') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '14') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '15') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '16') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '17') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '18') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '19') {
-        data.iddiretoria = '2';
-    }else if (data.idome === '20') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '21') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '22') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '23') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '24') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '25') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '26') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '27') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '28') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '29') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '30') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '31') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '32') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '33') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '34') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '35') {
-        data.iddiretoria = '3';
-    }else if (data.idome === '36') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '37') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '38') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '39') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '40') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '41') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '42') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '43') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '44') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '45') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '46') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '47') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '48') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '49') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '50') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '51') {
-        data.iddiretoria = '4';
-    }else if (data.idome === '52') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '53') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '54') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '55') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '56') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '57') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '58') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '59') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '60') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '61') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '62') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '63') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '64') {
-        data.iddiretoria = '5';
-    }else if (data.idome === '65') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '66') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '67') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '68') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '69') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '70') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '71') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '72') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '73') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '74') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '75') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '76') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '77') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '78') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '79') {
-        data.iddiretoria = '1';
-    }else if (data.idome === '80') {
-        data.iddiretoria = '1';
-    } else {
-        // Defina um valor padrão ou tratamento para outros casos, se necessário
-    }
+    // Mapeamento para iddiretoria
+    const iddiretoriaMap = {
+        '1': '1', '2': '2', '3': '3', '4': '4', '5': '5',
+        '6': '2', '7': '2', '8': '2', '9': '2', '10': '2',
+        '11': '2', '12': '2', '13': '2', '14': '2', '15': '2',
+        '16': '2', '17': '2', '18': '2', '19': '2', '20': '3',
+        '21': '3', '22': '3', '23': '3', '24': '3', '25': '3',
+        '26': '3', '27': '3', '28': '3', '29': '3', '30': '3',
+        '31': '3', '32': '3', '33': '3', '34': '3', '35': '3',
+        '36': '4', '37': '4', '38': '4', '39': '4', '40': '4',
+        '41': '4', '42': '4', '43': '4', '44': '4', '45': '4',
+        '46': '4', '47': '4', '48': '4', '49': '4', '50': '4',
+        '51': '4', '52': '5', '53': '5', '54': '5', '55': '5',
+        '56': '5', '57': '5', '58': '5', '59': '5', '60': '5',
+        '61': '5', '62': '5', '63': '5', '64': '5', '65': '1',
+        '66': '1', '67': '1', '68': '1', '69': '1', '70': '1',
+        '71': '1', '72': '1', '73': '1', '74': '1', '75': '1',
+        '76': '1', '77': '1', '78': '1', '79': '1', '80': '1'
+    };
+
+    // Definindo iddiretoria e cod com base no mapeamento
+    data.iddiretoria = iddiretoriaMap[data.idome] || null;
 
     // Validar os campos utilizando o yup   
     const schema = yup.object().shape({
@@ -1024,16 +882,17 @@ router.get('/edit/:id', eAdmin, async (req, res) => {
             attributes: ['id', 'nome'],
             where: {
                 id: {
-                    [Op.in]: [2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                        4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                        62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73
-                    ]
+                    [Op.in]: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                        21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                        41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                        61,62,65,66,67,68,69,70,71,72,73,74,75,76]
                 }
             },
             order: [
-                [Sequelize.literal(`FIELD(id, ${[2, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 3, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33,
-                    4, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 5, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
-                    62, 1, 65, 66, 67, 68, 69, 70, 71, 72, 73].join(',')})`)],
+                [Sequelize.literal(`FIELD(id, ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,20,
+                    21,22,23,24,25,26,27,28,29,30,31,32,33,36,37,38,39,40,
+                    41,42,43,44,45,46,47,48,49,52,53,54,55,56,57,58,59,60,
+                    61,62,65,66,67,68,69,70,71,72,73,74,75,76].join(',')})`)],
             ]
         });
         if (omes) {dataForm['omes'] = omes;}
@@ -1161,9 +1020,5 @@ router.get('/diariasgercota/:id', eAdmin, async (req, res) => {
      });
  });
  
-
-
-
-
 
 module.exports = router;

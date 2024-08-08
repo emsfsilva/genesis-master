@@ -77,17 +77,23 @@ app.engine('handlebars', engine({
         formatDateTime: (date) => {
             return moment(date).format('DD/MM/YYYY HH:mm:ss');
         },
-        //BLOCO PARA POINTAR AS CELULAS QUE cotaofdist e cotaprcdist seja maior (tabela eventos pjes)
         gt: function(a, b, options) {
-            if (a > b) {
-                return options.fn(this);
-            } else {
-                return options.inverse(this);
-            }
-        }
+            return a > b ? options.fn(this) : options.inverse(this);
+        },
+        // Helper para verificar se a variável é diferente da outra
+        ne: function(a, b, options) {
+            return a != b ? options.fn(this) : options.inverse(this);
+        },
+        // Helper para verificar se a variável é maior ou igual à outra
+        gte: function(a, b, options) {
+            return a >= b ? options.fn(this) : options.inverse(this);
+        },
+        // Helper para verificar se a variável é menor ou igual à outra
+        lte: function(a, b, options) {
+            return a <= b ? options.fn(this) : options.inverse(this);
+        },
     }
 }));
-
 // Incluir as CONTROLLERS
 const home = require('./controllers/home');
 const login = require('./controllers/login');

@@ -96,7 +96,8 @@ module.exports = function (passport) {
                 where: { loginsei },
                 include: [
                     { model: db.omes, attributes: ['id', 'nome'] },
-                    { model: db.situations, attributes: ['id', 'nameSituation'] }
+                    { model: db.situations, attributes: ['id', 'nameSituation'] },
+                    { model: db.omes, as: 'PcontasOme', attributes: ['nome'], required: false }
                 ]
             });
 
@@ -136,7 +137,8 @@ module.exports = function (passport) {
                 attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'pcontasOmeId', 'loginsei', 'matricula', 'telefone'],
                 include: [
                     { model: db.omes, attributes: ['id', 'nome'] },
-                    { model: db.situations, attributes: ['id', 'nameSituation'] }
+                    { model: db.situations, attributes: ['id', 'nameSituation'] },
+                    { model: db.omes, as: 'PcontasOme', attributes: ['nome'], required: false }
                 ],
             });
 

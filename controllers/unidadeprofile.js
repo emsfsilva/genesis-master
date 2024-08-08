@@ -11,14 +11,17 @@ const db = require('../db/models');
 const bcrypt = require('bcryptjs');
 // Validar input do formulário
 const yup = require('yup');
+const sequelize = db.sequelize; // Importe a instância do Sequelize
 // Operador do sequelize 
 const { Op } = require("sequelize");
+
+
 // Incluir o arquivo com a função de upload
 const upload = require('../helpers/uploadImgUser');
 // O módulo fs permite interagir com o sistema de arquivos
 const fs = require('fs');
 
-// Criar a rota do listar usuários, usar a função eAdmin com middleware para verificar se o usuário está logado
+/*// Criar a rota do listar usuários, usar a função eAdmin com middleware para verificar se o usuário está logado
 router.get('/', eAdmin, async (req, res) => {
 
     // Recuperar o registro do banco de dados
@@ -47,6 +50,354 @@ router.get('/', eAdmin, async (req, res) => {
         res.redirect('/login');
     }
 });
+
+*/
+
+
+/*
+
+// Criar a rota do listar usuários, usar a função eAdmin com middleware para verificar se o usuário está logado
+router.get('/', eAdmin, async (req, res) => {
+    try {
+        // Recuperar o registro do banco de dados
+        const user = await db.users.findOne({
+            attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'pcontasOmeId', 'loginsei', 'matricula', 'telefone', 'createdAt'],
+            where: { id: req.user.dataValues.id },
+            include: [
+                { model: db.omes, as: 'ome', attributes: ['nome'], required: false },
+                { model: db.omes, as: 'PcontasOme', attributes: ['nome'], required: false },
+                { model: db.situations, attributes: ['nameSituation'] }
+            ],
+        });
+
+        if (user) {
+
+            console.log('O user é', user);
+            // Extrair a matrícula do usuário
+            const matricula = user.matricula;
+
+            console.log('O matricula é', matricula);
+        
+            // Encontrar o PM escalado com base na matrícula do usuário
+            const pmEscalado = await db.escalas.findOne({
+                attributes: ['id', 'pg', 'matricula', 'nome', 'ome_sgpm'],
+                where: { matricula: matricula }
+            });
+        
+            // Encontrar todas as escalas associadas à matrícula do usuário
+            const escalasPorMatricula = await db.escalas.findAll({
+                attributes: ['matricula', 'idome', 'modalidade', 'idevento', 'data_inicio', 'hora_inicio', 'hora_fim'],
+                where: { matricula: matricula },
+                include: [
+                    { model: db.pjes, attributes: ['evento'], required: true },
+                    { model: db.omes, attributes: ['nome'], required: true }
+                ],
+                order: [['data_inicio', 'ASC']],
+            });
+        
+            if (!escalasPorMatricula || escalasPorMatricula.length === 0) {
+                return res.render('unidade/unidadeprofile/view', {
+                    layout: 'main',
+                    profile: req.user.dataValues,
+                    sidebarSituations: true,
+                    danger_msg: 'Nenhuma Escala Encontrada!'
+                });
+            }
+        
+            // Crie uma lista de combinações únicas de idevento, data_inicio e hora_inicio
+            const combinacoes = escalasPorMatricula.map(escala => ({
+                idevento: escala.idevento,
+                data_inicio: escala.data_inicio,
+                hora_inicio: escala.hora_inicio,
+                hora_fim: escala.hora_fim
+            }));
+        
+            // Agrupe as escalas por mês e evento
+            const escalasAgrupadas = {};
+        
+            for (const { idevento, data_inicio, hora_inicio, hora_fim } of combinacoes) {
+                const escalasAssociados = await db.escalas.findAll({
+                    attributes: ['id', 'pg', 'matricula', 'nome', 'telefone', 'ome_sgpm', 'modalidade', 'hora_inicio', 'hora_fim', 'idome', 'anotacoes'],
+                    where: {
+                        idevento: idevento,
+                        data_inicio: data_inicio,
+                        hora_inicio: hora_inicio,
+                        hora_fim: hora_fim
+                    },
+                    include: [
+                        { model: db.pjes, attributes: ['evento'], required: true },
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    order: [
+                        sequelize.literal(`CASE pg
+                            WHEN 'CEL' THEN 1
+                            WHEN 'TC' THEN 2
+                            WHEN 'MAJ' THEN 3
+                            WHEN 'CAP' THEN 4
+                            WHEN '1º TEN' THEN 5
+                            WHEN 'SUBTEN' THEN 6
+                            WHEN '1º SGT' THEN 7
+                            WHEN 'CB' THEN 8
+                            WHEN 'SD' THEN 9
+                            ELSE 10
+                        END`)
+                    ]
+                });
+        
+                const dataInicio = new Date(data_inicio);
+                const mes = dataInicio.toLocaleString('pt-BR', { month: 'long' }).toUpperCase(); // Exemplo: 'JANEIRO'
+                const chaveMes = `${mes}_${dataInicio.getFullYear()}`;
+        
+                if (!escalasAgrupadas[chaveMes]) {
+                    escalasAgrupadas[chaveMes] = {};
+                }
+        
+                const evento = escalasAssociados[0]?.pje?.evento || 'Desconhecido'; // Usar o evento do primeiro resultado como referência
+
+                console.log('As evento ', evento);
+        
+                if (!escalasAgrupadas[chaveMes][evento]) {
+                    escalasAgrupadas[chaveMes][evento] = {};
+                }
+        
+                const chaveIdeventoDataHora = `${idevento}_${data_inicio}_${hora_inicio}_${hora_fim}`;
+                
+                if (!escalasAgrupadas[chaveMes][evento][chaveIdeventoDataHora]) {
+                    escalasAgrupadas[chaveMes][evento][chaveIdeventoDataHora] = {
+                        idevento,
+                        data_inicio,
+                        hora_inicio,
+                        hora_fim,
+                        escalas: []
+                    };
+                }
+
+                escalasAgrupadas[chaveMes][evento][chaveIdeventoDataHora].escalas.push(...escalasAssociados.map(escala => ({
+                    id: escala.dataValues.id,
+                    pg: escala.dataValues.pg,
+                    matricula: escala.dataValues.matricula,
+                    nome: escala.dataValues.nome,
+                    telefone: escala.dataValues.telefone,
+                    ome_sgpm: escala.dataValues.ome_sgpm,
+                    modalidade: escala.dataValues.modalidade,
+                    hora_inicio: escala.dataValues.hora_inicio,
+                    hora_fim: escala.dataValues.hora_fim,
+                    anotacoes: escala.dataValues.anotacoes,
+                    ome: escala.dataValues.ome.nome,
+                })));
+            };
+
+            const escalasAgrupadasParaView = Object.entries(escalasAgrupadas).map(([mes, eventos]) => {
+                return {
+                  mes,
+                  eventos: Object.entries(eventos).map(([evento, ideventos]) => {
+                    return {
+                      evento,
+                      ideventos: Object.values(ideventos)
+                    };
+                  })
+                };
+              });
+
+            // Transforme as escalas em eventos para o FullCalendar
+            const eventosFullCalendar = [];
+            for (const escala of escalasPorMatricula) {
+                const dataInicioStr = escala.dataValues.data_inicio; // formato: 'YYYY-MM-DD'
+                const horaInicioStr = escala.dataValues.hora_inicio; // formato: 'HH:MM'
+                const horaFimStr = escala.dataValues.hora_fim; // formato: 'HH:MM'
+
+                // Crie a string completa para a data e hora
+                const startDateStr = `${dataInicioStr}T${horaInicioStr}:00`;
+                const endDateStr = `${dataInicioStr}T${horaFimStr}:00`;
+
+                // Crie os objetos Date
+                const startDate = new Date(startDateStr);
+                const endDate = new Date(endDateStr);
+
+                // Verifique se as datas foram criadas corretamente
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    console.error('Data inválida:', { startDateStr, endDateStr });
+                    continue; // Pule a iteração se a data for inválida
+                }
+
+                // Acesse corretamente os dados
+                const nome = escala.dataValues.pje.dataValues.evento || 'Desconhecido';
+                const matricula = escala.dataValues.matricula || 'Desconhecida';
+                const ome = escala.dataValues.ome.nome || 'Desconhecida';
+                const modalidade = escala.dataValues.modalidade || 'Desconhecida';
+
+                eventosFullCalendar.push({
+                    title: `${nome}`,
+                    start: startDate.toISOString(), // Formata a data para ISO 8601
+                    end: endDate.toISOString(),     // Formata a data para ISO 8601
+                    description: `${matricula}\nOme: ${ome}\nModalidade: ${modalidade}`
+                });
+            }
+
+            // Renderize a view com os eventos do FullCalendar
+            res.render('unidade/unidadeprofile/view', {
+                layout: 'main',
+                profile: req.user.dataValues,
+                user,
+                pmEscalado,
+                escalasAgrupadasPorMes: escalasAgrupadasParaView,
+                eventosFullCalendar: JSON.stringify(eventosFullCalendar), // Envie os eventos no formato JSON
+                sidebarSituations: true
+            });
+        } else {
+            // Criar a mensagem de erro
+            req.flash("danger_msg", "Erro: Usuário não encontrado!");
+            // Redirecionar o usuário
+            res.redirect('/login');
+        }
+    } catch (error) {
+        console.error('Erro no processamento da requisição:', error);
+        req.flash("danger_msg", "Erro interno do servidor.");
+        res.redirect('/login');
+    }
+});
+
+*/
+
+
+router.get('/', eAdmin, async (req, res) => {
+    try {
+        // Recuperar o registro do banco de dados
+        const user = await db.users.findOne({
+            attributes: ['id', 'name', 'email', 'image', 'situationId', 'omeId', 'pcontasOmeId', 'loginsei', 'matricula', 'telefone', 'createdAt'],
+            where: { id: req.user.dataValues.id },
+            include: [
+                { model: db.omes, as: 'ome', attributes: ['nome'], required: false },
+                { model: db.omes, as: 'PcontasOme', attributes: ['nome'], required: false },
+                { model: db.situations, attributes: ['nameSituation'] }
+            ],
+        });
+
+        if (user) {
+            console.log('O user é', user);
+            // Extrair a matrícula do usuário
+            const matricula = user.matricula;
+
+            console.log('O matricula é', matricula);
+        
+            // Encontrar o PM escalado com base na matrícula do usuário
+            const pmEscalado = await db.escalas.findOne({
+                attributes: ['id', 'pg', 'matricula', 'nome', 'ome_sgpm'],
+                where: { matricula: matricula }
+            });
+        
+            // Encontrar todas as escalas associadas à matrícula do usuário
+            const escalasPorMatricula = await db.escalas.findAll({
+                attributes: ['matricula', 'idome', 'modalidade', 'idevento', 'data_inicio', 'hora_inicio', 'hora_fim'],
+                where: { matricula: matricula },
+                include: [
+                    { model: db.pjes, attributes: ['evento'], required: true },
+                    { model: db.omes, attributes: ['nome'], required: true }
+                ],
+                order: [['data_inicio', 'ASC']],
+            });
+        
+            if (!escalasPorMatricula || escalasPorMatricula.length === 0) {
+                return res.render('unidade/unidadeprofile/view', {
+                    layout: 'main',
+                    profile: req.user.dataValues,
+                    sidebarSituations: true,
+                    danger_msg: 'Nenhuma Escala Encontrada!'
+                });
+            }
+        
+            // Crie uma lista de combinações únicas de idevento, data_inicio e hora_inicio
+            const combinacoes = escalasPorMatricula.map(escala => ({
+                idevento: escala.idevento,
+                data_inicio: escala.data_inicio,
+                hora_inicio: escala.hora_inicio,
+                hora_fim: escala.hora_fim
+            }));
+        
+            // Transforme as escalas em eventos para o FullCalendar
+            const eventosFullCalendar = [];
+            for (const { idevento, data_inicio, hora_inicio, hora_fim } of combinacoes) {
+                const escalasAssociados = await db.escalas.findAll({
+                    attributes: ['id', 'pg', 'matricula', 'nome', 'ome_sgpm', 'modalidade', 'telefone', 'localap', 'anotacoes'],
+                    where: {
+                        idevento: idevento,
+                        data_inicio: data_inicio,
+                        hora_inicio: hora_inicio,
+                        hora_fim: hora_fim
+                    },
+                    include: [
+                        { model: db.pjes, attributes: ['evento'], required: true },
+                        { model: db.omes, attributes: ['nome'] },
+                    ],
+                    order: [
+                        sequelize.literal(`CASE pg
+                            WHEN 'CEL' THEN 1
+                            WHEN 'TC' THEN 2
+                            WHEN 'MAJ' THEN 3
+                            WHEN 'CAP' THEN 4
+                            WHEN '1º TEN' THEN 5
+                            WHEN 'SUBTEN' THEN 6
+                            WHEN '1º SGT' THEN 7
+                            WHEN 'CB' THEN 8
+                            WHEN 'SD' THEN 9
+                            ELSE 10
+                        END`)
+                    ]
+                });
+
+                const startDateStr = `${data_inicio}T${hora_inicio}:00`;
+                const endDateStr = `${data_inicio}T${hora_fim}:00`;
+
+                const startDate = new Date(startDateStr);
+                const endDate = new Date(endDateStr);
+
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    console.error('Data inválida:', { startDateStr, endDateStr });
+                    continue;
+                }
+
+                const nomeEvento = escalasAssociados[0]?.pje?.evento || 'Desconhecido';
+                const omeNome = escalasAssociados[0]?.ome?.nome || 'Desconhecido';
+
+                const associadosDetalhes = escalasAssociados.map(a =>
+                    ` - Nome: ${a.nome}\n - Mat: ${a.matricula}\n - P/G: ${a.pg}\n - Funç: ${a.modalidade}\n - Fone: ${a.telefone}\n - Local Ap: ${a.localap}\n - Obs: ${a.anotacoes}
+                    \n ___________________________________________ `
+                ).join('\n\n');
+
+                eventosFullCalendar.push({
+                    title: nomeEvento + ` | ${hora_inicio} às ${hora_fim} | ${omeNome}`,
+                    start: startDate.toISOString(),
+                    end: endDate.toISOString(),
+                    //description: `Nome do Evento: ${nomeEvento}\nHora Início: ${hora_inicio}\nHora Fim: ${hora_fim}\nOME: ${omeNome}\n\nAssociados:\n${associadosDetalhes}`
+                    description: `Equipe:\n${associadosDetalhes}`
+                });
+            }
+
+            // Renderize a view com os eventos do FullCalendar
+            res.render('unidade/unidadeprofile/view', {
+                layout: 'main',
+                profile: req.user.dataValues,
+                user,
+                pmEscalado,
+                eventosFullCalendar: JSON.stringify(eventosFullCalendar),
+                sidebarSituations: true
+            });
+        } else {
+            // Criar a mensagem de erro
+            req.flash("danger_msg", "Erro: Usuário não encontrado!");
+            // Redirecionar o usuário
+            res.redirect('/login');
+        }
+    } catch (error) {
+        console.error('Erro no processamento da requisição:', error);
+        req.flash("danger_msg", "Erro interno do servidor.");
+        res.redirect('/login');
+    }
+});
+
+
+
+
 
 // Criar a rota para página com formulário editar senha do perfil
 router.get('/edit', eAdmin, async (req, res) => {

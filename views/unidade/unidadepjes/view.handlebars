@@ -58,31 +58,82 @@
     }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#matricula').on('blur', function() {
-            var matricula = $(this).val();
-            if (matricula) {
-                $.ajax({
-                    url: '/pjes/buscarSgpm/' + matricula,
-                    type: 'GET',
-                    success: function(data) {
-                        $('#pg').val(data.pg);
-                        $('#nome').val(data.nome);
-                        $('#ome_sgpm').val(data.ome);
-                        $('#status').val(data.status);
-                        $('#nunfunc').val(data.nunfunc);
-                        $('#localap').val(data.localap);
-                    },
-                    error: function(err) {
-                        console.error('Erro ao buscar usuário:', err);
-                    }
-                });
-            }
-        });
-    });
+<!--<script>
+        $(document).ready(function() {
+            $('#matricula').on('blur', function() {
+                var matricula = $(this).val();
+                if (matricula) {
+                    $.ajax({
+                        url: '/pjes/buscarSgpm/' + matricula,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#pg').val(data.pg);
+                            $('#nome').val(data.nome);
+                            $('#ome_sgpm').val(data.ome);
+                            $('#status').val(data.status);
+                            $('#nunfunc').val(data.nunfunc);
+                            $('#localap').val(data.localap);
 
+                            // Limpar a tabela antes de preencher
+                            $('#servicos tbody').empty();
+                            // Preencher a tabela com os serviços detalhados
+                            data.servicosDetalhados.forEach(function(servico) {
+                                $('#servicos tbody').append(
+                                    `<tr>
+                                        <td>${servico.dia}</td>
+                                        <td>${servico.nome}</td>
+                                        <td>${servico.total_servicos}</td>
+                                    </tr>`
+                                );
+                            });
+                        },
+                        error: function(err) {
+                            console.error('Erro ao buscar usuário:', err);
+                        }
+                    });
+                }
+            });
+        });
 </script>
+-->
+
+<script>
+        $(document).ready(function() {
+            $('#matricula').on('blur', function() {
+                var matricula = $(this).val();
+                if (matricula) {
+                    $.ajax({
+                        url: '/pjes/buscarSgpm/' + matricula,
+                        type: 'GET',
+                        success: function(data) {
+                            $('#pg').val(data.pg);
+                            $('#nome').val(data.nome);
+                            $('#ome_sgpm').val(data.ome);
+                            $('#status').val(data.status);
+                            $('#nunfunc').val(data.nunfunc);
+                            $('#localap').val(data.localap);
+
+                            // Limpar a tabela antes de preencher
+                            $('#servicos tbody').empty();
+                            // Preencher a tabela com os serviços detalhados
+                            data.servicosDetalhados.forEach(function(servico) {
+                                $('#servicos tbody').append(
+                                    `<tr>
+                                        <th>${servico.dia} - </th>
+                                        <td>${servico.nome}</td>
+                                    </tr>`
+                                );
+                            });
+                        },
+                        error: function(err) {
+                            console.error('Erro ao buscar usuário:', err);
+                        }
+                    });
+                }
+            });
+        });
+</script>
+
 
 
 <!-- page content -->
@@ -110,7 +161,7 @@
                                 <form id="meuFormulario" class="form-horizontal form-label-left" action="/unidade/unidadepjes/escalas/{{pjes.dataValues.id}}" method="POST">
 
                                     <!-- INICIO DETALHES DO EVENTO PJES -->
-                                        <div class="col-md-2 col-sm-2 x_panel">
+                                        <div class="col-md-3 col-sm-3 x_panel">
                                             <section class="panel">
                                                 <div class="panel-body">
                                                     <h3 class="green"><i class="fa fa-paint-brush"></i>
@@ -162,7 +213,7 @@
                                     <!-- FIM DETALHES DO EVENTO PJES -->
 
                                     <!-- INICIO ESCALA DE SERVIÇO -->
-                                        <div class="col-md-10 col-sm-10 x_panel">
+                                        <div class="col-md-9 col-sm-9 x_panel">
 
                                             Previsto
                                             <ul class="stats-overview" style="padding-left: 0px">
@@ -215,50 +266,101 @@
                                                                     <h5>Informações do Policial</h5>
                                                                     <div class="clearfix"></div>
                                                                 </div>
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
-                                                                    <input style="font-size: 11px" name="matricula" id="matricula" type="number" class="form-control has-feedback-left" required placeholder="MATRICULA">
-                                                                        <span class="fa fa-barcode form-control-feedback left" aria-hidden="true"></span>
-                                                                </div>
 
-                                                                <div class="col-md-12 col-sm-12  profile_left">
-                                                                    <div class="profile_img">
-                                                                        <div id="crop-avatar">
-                                                                        <!-- Current avatar -->
-                                                                        <img class="img-responsive avatar-view" src="/images/users/usuariopadrao.png" width="90px" height="90px">
+                                                                <div class="x_panel">
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                                        <input style="font-size: 11px" name="matricula" id="matricula" type="number" class="form-control has-feedback-left" required placeholder="MATRICULA">
+                                                                            <span class="fa fa-barcode form-control-feedback left" aria-hidden="true"></span>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 col-sm-12  profile_left">
+                                                                        <div class="profile_img">
+                                                                            <div id="crop-avatar">
+                                                                            <!-- Current avatar -->
+                                                                            <img class="img-responsive avatar-view" src="/images/users/usuariopadrao.png" width="60px" height="60px">
+                                                                            </div>
                                                                         </div>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback"></div>
+
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                                        <input style="font-size: 11px" name="pg" id="pg" type="text" class="form-control has-feedback-left" placeholder="POST/GRAD" readonly>
+                                                                        <span class="fa fa-tag form-control-feedback left" aria-hidden="true"></span>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                                        <input style="font-size: 11px" name="nome" id="nome" type="text" class="form-control has-feedback-left" placeholder="NOME DE GUERRA" readonly>
+                                                                        <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                                        <input style="font-size: 11px" name="ome_sgpm" id="ome_sgpm" type="text" class="form-control has-feedback-left" placeholder="OME" readonly>
+                                                                        <span class="fa fa-university form-control-feedback left" aria-hidden="true"></span>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                                        <input style="font-size: 11px" name="status" id="status" type="text" class="form-control has-feedback-left" placeholder="SITUAÇÃO" readonly>
+                                                                        <span class="fa fa-info form-control-feedback left" aria-hidden="true"></span>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                                        <input style="font-size: 11px" name="nunfunc" id="nunfunc" type="text" class="form-control has-feedback-left" placeholder="NUNFUNC" readonly>
+                                                                        <span class="fa fa-info form-control-feedback left" aria-hidden="true"></span>
+                                                                    </div>
+                                                                    
+                                                                    <div class="col-md-12 col-sm-12  form-group has-feedback">
+                                                                        <input style="font-size: 11px" name="telefone" id="telefone" type="phone" class="form-control has-feedback-left" placeholder="TELEFONE">
+                                                                        <span class="fa fa-phone form-control-feedback left" aria-hidden="true"></span>
                                                                     </div>
                                                                 </div>
 
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback"></div>
+                                                                <div class="x_panel">
 
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
-                                                                    <input style="font-size: 11px" name="pg" id="pg" type="text" class="form-control has-feedback-left" placeholder="POST/GRAD" readonly>
-                                                                    <span class="fa fa-tag form-control-feedback left" aria-hidden="true"></span>
-                                                                </div>
+                                                                    <div class="col-sm-12">
+                                                                        <p>Total de Serviços - {{pjes.dataValues.mes}}_{{pjes.dataValues.ano}}</p>
+                                                                    </div>
+                                                                    
 
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
-                                                                    <input style="font-size: 11px" name="nome" id="nome" type="text" class="form-control has-feedback-left" placeholder="NOME DE GUERRA" readonly>
-                                                                    <span class="fa fa-user form-control-feedback left" aria-hidden="true"></span>
-                                                                </div>
+                                                                    
+                                                                        <div class="x_panel col-md-6 col-sm-6">
+                                                                            <div class="col-md-12 col-sm-12">
+                                                                                <b>PJES</b>
+                                                                                <table style="font-size: 10px;" id="servicos">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Data</th>
+                                                                                            <th>Unidade</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <!-- As linhas serão preenchidas dinamicamente -->
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
 
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
-                                                                    <input style="font-size: 11px" name="ome_sgpm" id="ome_sgpm" type="text" class="form-control has-feedback-left" placeholder="OME" readonly>
-                                                                    <span class="fa fa-university form-control-feedback left" aria-hidden="true"></span>
-                                                                </div>
+                                                                        <div class="x_panel col-md-6 col-sm-6">
+                                                                            <div class="col-md-12 col-sm-12">
+                                                                                <b>DIARIAS</b>
+                                                                                <table style="font-size: 10px" id="">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Data</th>
+                                                                                            <th>Unidade</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <!-- As linhas serão preenchidas dinamicamente -->
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    
 
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
-                                                                    <input style="font-size: 11px" name="status" id="status" type="text" class="form-control has-feedback-left" placeholder="SITUAÇÃO" readonly>
-                                                                    <span class="fa fa-info form-control-feedback left" aria-hidden="true"></span>
-                                                                </div>
+                                                                        
 
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
-                                                                    <input style="font-size: 11px" name="nunfunc" id="nunfunc" type="text" class="form-control has-feedback-left" placeholder="NUNFUNC" readonly>
-                                                                    <span class="fa fa-info form-control-feedback left" aria-hidden="true"></span>
-                                                                </div>
-                                                                
-                                                                <div class="col-md-12 col-sm-12  form-group has-feedback">
-                                                                    <input style="font-size: 11px" name="telefone" id="telefone" type="phone" class="form-control has-feedback-left" placeholder="TELEFONE">
-                                                                    <span class="fa fa-phone form-control-feedback left" aria-hidden="true"></span>
+                                                                    
                                                                 </div>
 
                                                             </div>
